@@ -13,4 +13,5 @@ extension Font {
     static let appBody: Font = system(size: 16, weight: .regular, design: .default)
     static let appBodySmall: Font = system(size: 13, weight: .regular, design: .default)
     static let appBodyExtraSmall: Font = system(size: 11, weight: .regular, design: .default)
+    static let appButtonPrimary: Font = system(size: 18, weight: .bold, design: .default)
 }

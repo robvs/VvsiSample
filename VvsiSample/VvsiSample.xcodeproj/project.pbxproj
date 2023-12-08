@@ -17,6 +17,7 @@
 		7FB273222B1ECFF500AAC5DB /* VvsiSampleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB273212B1ECFF500AAC5DB /* VvsiSampleUITestsLaunchTests.swift */; };
 		7FE311572B21676E00E097D7 /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE311562B21676E00E097D7 /* Font.swift */; };
 		7FE3115C2B21705900E097D7 /* TextModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE3115B2B21705900E097D7 /* TextModifiers.swift */; };
+		7FE311642B22BDA800E097D7 /* AppButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE311632B22BDA800E097D7 /* AppButtonStyle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		7FB273212B1ECFF500AAC5DB /* VvsiSampleUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VvsiSampleUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		7FE311562B21676E00E097D7 /* Font.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Font.swift; sourceTree = "<group>"; };
 		7FE3115B2B21705900E097D7 /* TextModifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextModifiers.swift; sourceTree = "<group>"; };
+		7FE311632B22BDA800E097D7 /* AppButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppButtonStyle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +92,8 @@
 		7F308B4F2B1ED7D3009682EB /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7FE3115D2B22A78800E097D7 /* _Components */,
+				7FE3115A2B21702800E097D7 /* _Modifiers */,
 				7FB273052B1ECFF400AAC5DB /* HomeView.swift */,
 			);
 			path = Views;
@@ -120,7 +124,6 @@
 			children = (
 				7F308B4C2B1ED651009682EB /* Extensions */,
 				7F308B4F2B1ED7D3009682EB /* Views */,
-				7FE3115A2B21702800E097D7 /* ViewModifiers */,
 				7FB273032B1ECFF400AAC5DB /* VvsiSampleApp.swift */,
 				7FB273072B1ECFF500AAC5DB /* Assets.xcassets */,
 				7FB273092B1ECFF500AAC5DB /* VvsiSample.entitlements */,
@@ -154,12 +157,20 @@
 			path = VvsiSampleUITests;
 			sourceTree = "<group>";
 		};
-		7FE3115A2B21702800E097D7 /* ViewModifiers */ = {
+		7FE3115A2B21702800E097D7 /* _Modifiers */ = {
 			isa = PBXGroup;
 			children = (
 				7FE3115B2B21705900E097D7 /* TextModifiers.swift */,
 			);
-			path = ViewModifiers;
+			path = _Modifiers;
+			sourceTree = "<group>";
+		};
+		7FE3115D2B22A78800E097D7 /* _Components */ = {
+			isa = PBXGroup;
+			children = (
+				7FE311632B22BDA800E097D7 /* AppButtonStyle.swift */,
+			);
+			path = _Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -292,6 +303,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FE311642B22BDA800E097D7 /* AppButtonStyle.swift in Sources */,
 				7FE311572B21676E00E097D7 /* Font.swift in Sources */,
 				7FE3115C2B21705900E097D7 /* TextModifiers.swift in Sources */,
 				7FB273062B1ECFF400AAC5DB /* HomeView.swift in Sources */,
