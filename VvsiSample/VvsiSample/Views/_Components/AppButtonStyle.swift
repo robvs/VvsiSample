@@ -39,14 +39,14 @@ fileprivate struct ButtonPreview: View {
         VStack(spacing: 16) {
             Button(action: {
             }, label: {
-                Label("Button", systemImage: "arrowshape.right.circle")
+                Label("Button", systemImage: "house")
             })
             .buttonStyle(AppButtonStyle.Primary())
 
             // disabled
             Button(action: {
             }, label: {
-                Label("Button", systemImage: "arrowshape.right.circle")
+                Label("Button", systemImage: "house")
             })
             .buttonStyle(AppButtonStyle.Primary())
             .disabled(true)

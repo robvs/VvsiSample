@@ -1,18 +1,18 @@
 # VvsiSample
 This is a sample application that illustrates use of the VVSI UI design pattern in SwiftUI.
 
-VVSI stands for View-ViewState-ViewInteractor. It's a design pattern that borrows from MVVM and MVP and is intended to provide a consisten and clear approach towards organizing view-related code.
+VVSI stands for View-ViewState-ViewInteractor. It's a design pattern born out of MVVM while borrowing a little from MVC and VIP. VVSI is intended to provide a consistent and clear approach towards organizing view-related code.
 
 ## Background
 
 ### MVC
-MVC (model-view-controller) is the natural design pattern for use in UIKit applications. In practice in iOS applications, you'd end up with a View Controller that's bloated, difficult to maintain and difficult to test.
+MVC (model-view-controller) is the natural design pattern for use in UIKit applications. In practice in iOS applications, you'd often end up with a View Controller that's bloated, difficult to maintain and difficult to test.
 
 ### MVVM
-MVVM (model-view-view model) is the natural design pattern for use in SwiftUI applications. It is an improvement over MVC, but View Models still tend to include too much business logic and have too many dependencies. This leads to overly complicated preview code and overly complicated unit tests for many views in your application.
+MVVM (model-view-view model) is a more natural design pattern for use in SwiftUI applications. It is an improvement over MVC, but View Models still tend to include too much business logic and have too many dependencies. This leads to overly complicated preview code and overly complicated unit tests for many of the views in an application.
 
 ## VVSI
-VVSI (View-View State-View Interactor) attempts to address the primary issues with complex MVVM scenarios and provides guidelines for when the overhead of a View State or View Interactor is warranted.
+VVSI (View-View State-View Interactor) attempts to address the primary issues with complex MVVM scenarios and provides guidelines for when the overhead of a View State or View Interactor is or isn't warranted.
 
 ### View
 A SwiftUI View provides the layout of a full screen or a subview.
