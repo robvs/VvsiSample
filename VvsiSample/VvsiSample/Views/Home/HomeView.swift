@@ -8,14 +8,16 @@ struct HomeView: View {
     private let categoryNames = ["animal","career","celebrity","dev","explicit","fashion","food","history","money","movie","music","political","religion","science","sport","travel"]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            header()
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                header()
 
-            randomJoke()
+                randomJoke()
 
-            categories()
+                categories()
+            }
+            .padding(.horizontal)
         }
-        .padding(.horizontal)
     }
 }
 
@@ -62,7 +64,7 @@ private extension HomeView {
                     .foregroundStyle(.appTextLink)
                     .padding(4)
                     .onTapGesture {
-
+                        print("refresh random joke")
                     }
             }
 
@@ -81,11 +83,16 @@ private extension HomeView {
             ScrollView {
                 VStack(spacing: 0) {
                     ForEach(categoryNames, id: \.self) { categoryName in
-                        CategoryListItemView(categoryName: categoryName)
+                        NavigationLink(value: categoryName) {
+                            CategoryListItemView(categoryName: categoryName)
+                        }
                     }
                 }
                 .padding(.horizontal, 16)
             }
+        }
+        .navigationDestination(for: String.self) { selectedCategory in
+            CategoryView(selectedCategory: selectedCategory)
         }
     }
 }

@@ -9,7 +9,12 @@ VVSI stands for View-ViewState-ViewInteractor. It's a design pattern born out of
 MVC (model-view-controller) is the natural design pattern for use in UIKit applications. In practice in iOS applications, you'd often end up with a View Controller that's bloated, difficult to maintain and difficult to test.
 
 ### MVVM
-MVVM (model-view-view model) is a more natural design pattern for use in SwiftUI applications. It is an improvement over MVC, but View Models still tend to include too much business logic and have too many dependencies. This leads to overly complicated preview code and overly complicated unit tests for many of the views in an application.
+MVVM (model-view-view model) is a more natural design pattern for use in SwiftUI applications. Implementations typically include:
+
+- A `View` that defines the layout and has a reference to a `ViewModel` object that drives the dynamic content.
+- A `ViewModel` that includes system dependencies along with the logic to transform model data into view data.
+
+This is an improvement over MVC, but View Models still tend to include too much business logic and have too many dependencies. This leads to overly complicated SwiftUI preview code and overly complicated unit tests.
 
 ## VVSI
 VVSI (View-View State-View Interactor) attempts to address the primary issues with complex MVVM scenarios and provides guidelines for when the overhead of a View State or View Interactor is or isn't warranted.
