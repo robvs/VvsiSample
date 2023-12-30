@@ -1,11 +1,10 @@
-//  Copyright © 2023 Rob Vander Sloot
+//  Copyright © 2024 Rob Vander Sloot
 //
 
 import SwiftUI
 
 struct HomeView: View {
-
-    private let categoryNames = ["animal","career","celebrity","dev","explicit","fashion","food","history","money","movie","music","political","religion","science","sport","travel"]
+    @ObservedObject var viewState: HomeViewState
 
     var body: some View {
         NavigationStack {
@@ -17,6 +16,8 @@ struct HomeView: View {
                 categories()
             }
             .padding(.horizontal)
+            .navigationTitle("Home")
+            .toolbar(.hidden, for: .navigationBar)
         }
     }
 }
@@ -61,17 +62,24 @@ private extension HomeView {
                 Spacer()
 
                 Image(systemName: "arrow.clockwise")
-                    .foregroundStyle(.appTextLink)
+                    .foregroundStyle(viewState.refreshButtonDisabled ? .appOnSurfaceDisabled : .appTextLink)
                     .padding(4)
                     .onTapGesture {
                         print("refresh random joke")
                     }
+                    .disabled(viewState.refreshButtonDisabled)
             }
 
-            Text("Chuck Norris can kill you with a headshot using a shotgun from across the map on call of duty.")
-                .appBodyText()
-                .italic()
-                .padding(.horizontal, 16)
+            if let randomJoke = viewState.randomJoke {
+                Text(randomJoke)
+                    .appBodyText()
+                    .italic()
+                    .padding(.horizontal, 16)
+            }
+            else {
+                Text("This is dummy text to provide something to be redacted.")
+                    .redacted(reason: .placeholder)
+            }
         }
     }
 
@@ -82,10 +90,20 @@ private extension HomeView {
 
             ScrollView {
                 VStack(spacing: 0) {
-                    ForEach(categoryNames, id: \.self) { categoryName in
-                        NavigationLink(value: categoryName) {
-                            CategoryListItemView(categoryName: categoryName)
+                    if let categoryNames = viewState.categories {
+                        ForEach(categoryNames, id: \.self) { categoryName in
+                            NavigationLink(value: categoryName) {
+                                HomeCategoryListRow(categoryName: categoryName)
+                            }
                         }
+                    }
+                    else {
+                        Group {
+                            Text("Category 1")
+                            Text("Category 2")
+                            Text("Category 3")
+                        }
+                        .redacted(reason: .placeholder)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -100,12 +118,43 @@ private extension HomeView {
 
 // MARK: - Previews
 
-#Preview("Light") {
-    HomeView()
+#Preview("Initial State") {
+    return HomeView(viewState: HomeViewState())
+        .preferredColorScheme(.light)
+}
+
+#Preview("Joke Loaded") {
+    let viewState = HomeViewState()
+    return HomeView(viewState: viewState)
+        .task {
+            await viewState.set(state: .updateRandomJoke(joke: randomJoke))
+        }
+        .preferredColorScheme(.light)
+}
+
+#Preview("Categories Loaded") {
+    let viewState = HomeViewState()
+    return HomeView(viewState: viewState)
+        .task {
+            await viewState.set(state: .updateCategories(categories: categoryNames))
+        }
+        .preferredColorScheme(.light)
+}
+
+#Preview("Ready") {
+    let viewState = HomeViewState()
+    return HomeView(viewState: viewState)
+        .task {
+            await viewState.set(state: .updateRandomJoke(joke: randomJoke))
+            await viewState.set(state: .updateCategories(categories: categoryNames))
+        }
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
-    HomeView()
+    return HomeView(viewState: HomeViewState())
         .preferredColorScheme(.dark)
 }
+
+fileprivate let randomJoke = "Chuck Norris can kill you with a headshot using a shotgun from across the map on call of duty."
+fileprivate let categoryNames = ["animal","career","celebrity","dev","explicit","fashion","food","history","money","movie","music","political","religion","science","sport","travel"]

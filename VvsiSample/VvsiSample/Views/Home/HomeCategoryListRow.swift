@@ -1,9 +1,9 @@
-//  Copyright © 2023 Rob Vander Sloot
+//  Copyright © 2024 Rob Vander Sloot
 //
 
 import SwiftUI
 
-struct CategoryListItemView: View {
+struct HomeCategoryListRow: View {
 
     let categoryName: String
 
@@ -32,18 +32,18 @@ struct CategoryListItemView: View {
 
 #Preview("Light") {
     VStack(spacing: 0) {
-        CategoryListItemView(categoryName: "Category Name")
-        CategoryListItemView(categoryName: "Category Name")
-        CategoryListItemView(categoryName: "Category Name")
+        HomeCategoryListRow(categoryName: "Category Name")
+        HomeCategoryListRow(categoryName: "Category Name")
+        HomeCategoryListRow(categoryName: "Category Name")
     }
     .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
     VStack(spacing: 0) {
-        CategoryListItemView(categoryName: "Category Name")
-        CategoryListItemView(categoryName: "Category Name")
-        CategoryListItemView(categoryName: "Category Name")
+        HomeCategoryListRow(categoryName: "Category Name")
+        HomeCategoryListRow(categoryName: "Category Name")
+        HomeCategoryListRow(categoryName: "Category Name")
     }
     .preferredColorScheme(.dark)
 }

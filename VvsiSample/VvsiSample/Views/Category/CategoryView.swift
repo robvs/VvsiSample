@@ -1,4 +1,4 @@
-//  Copyright © 2023 Rob Vander Sloot
+//  Copyright © 2024 Rob Vander Sloot
 //
 
 import SwiftUI
@@ -27,6 +27,7 @@ struct CategoryView: View {
         .padding(.top, 8)
         .padding(.horizontal, 16)
         .navigationTitle(selectedCategory.capitalized)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

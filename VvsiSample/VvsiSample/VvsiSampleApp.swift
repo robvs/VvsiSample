@@ -1,4 +1,4 @@
-//  Copyright © 2023 Rob Vander Sloot
+//  Copyright © 2024 Rob Vander Sloot
 //
 
 import SwiftUI
@@ -7,7 +7,7 @@ import SwiftUI
 struct VvsiSampleApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            HomeView(viewState: HomeViewState())
         }
     }
 }
