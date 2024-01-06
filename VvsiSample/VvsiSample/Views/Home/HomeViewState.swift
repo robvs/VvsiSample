@@ -7,15 +7,33 @@ import SwiftUI
 typealias HomeViewStateBase = ViewStateBase<HomeViewState.State, 
                                             HomeViewState.Event>
 
+/// Manage view state for the Home screen.
 class HomeViewState: HomeViewStateBase {
 
     // MARK: State definition
 
     /// Available view states.
     enum State: Equatable {
+        /// Indicates that one or more items are being loaded.
         case loading(includesRandomJoke: Bool, includesCategories: Bool)
-        case updateRandomJoke(joke: String)
-        case updateCategories(categories: [String])
+
+        /// Update the random joke to the given value.
+        /// NOTE: This does not change `currentState` to `updateRandomJoke`. If both random
+        /// joke and categories are loaded with this update, `currentState` changes to `ready`.
+        /// - parameters:
+        ///  - joke: The joke to be displayed. `nil` indicates loading or error.
+        ///  - errorMessage: The error message to be displayed.
+        case updateRandomJoke(_ joke: String?, errorMessage: String? = nil)
+
+        /// Update the categories to the given set.
+        /// NOTE: This does not change `currentState` to `updateRandomJoke`. If both random
+        /// joke and categories are loaded with this update, `currentState` changes to `ready`.
+        /// - parameters:
+        ///  - categories: The categories to be listed. `nil` indicates loading or error.
+        ///  - errorMessage: The error message to be displayed.
+        case updateCategories(_ categories: [String]?, errorMessage: String? = nil)
+
+        /// Indicates that loading is complete and the view is ready.
         case ready
     }
 
@@ -27,9 +45,12 @@ class HomeViewState: HomeViewStateBase {
     }
 
     // MARK: Published values
+    // use `private (set)` to enforce use of `set(state:)` to change published values.
 
-    @Published private (set) var randomJoke: String? = nil   // nil indicates loading
-    @Published private (set) var categories: [String]? = nil // nil indicates loading
+    @Published private (set) var randomJoke: String?      // nil indicates loading
+    @Published private (set) var randomJokeError: String?
+    @Published private (set) var categories: [String]?    // nil indicates loading
+    @Published private (set) var categoriesError: String?
     @Published private (set) var refreshButtonDisabled: Bool = true
 
     // MARK: Object lifecycle
@@ -47,14 +68,28 @@ class HomeViewState: HomeViewStateBase {
     @MainActor
     override func set(state: ViewStateBase<State, Event>.State) async {
         switch state {
-        case .updateRandomJoke(let joke):
-            randomJoke = joke
+        case .updateRandomJoke(let randomJoke, let errorMessage):
+            if let errorMessage = errorMessage {
+                self.randomJoke = nil
+                randomJokeError = errorMessage
+            }
+            else {
+                self.randomJoke = randomJoke
+            }
+
             if areCategoriesLoading == false {
                 await super.set(state: .ready)
             }
 
-        case .updateCategories(let categories):
-            self.categories = categories
+        case .updateCategories(let categories, let errorMessage):
+            if let errorMessage = errorMessage {
+                self.categories = nil
+                categoriesError = errorMessage
+            }
+            else {
+                self.categories = categories
+            }
+
             if isRandomJokeLoading == false {
                 await super.set(state: .ready)
             }

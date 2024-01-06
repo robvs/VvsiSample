@@ -36,10 +36,11 @@ View States should follow these guidelines:
 - Create a View State for full-screen views and for sub views that have enough complexity to warrant it. View State objects are generally not necessary for simple sub views such as buttons.
 - Use @Published properties for all dynamic values (values that may change during the view's lifetime).
 - Use regular `let` properties for values that are determined at runtime but do not change during the view's lifecycle.
+- Dependencies should be restricted to simple data objects.
 - Avoid business/domain logic. Logic should be focussed on transforming model values into what's needed for the View.
 - Avoid dependencies on system resources such as databases, web services, etc. that's what View Interactors are for.
 
-The View and View State are tightly coupled and should be all that is needed to render previews. Although some simple model objects are often needed as well.
+The View and View State are tightly coupled and should be all that is needed to render previews. And since the only dependencies are simple data objects/structs, there's no need for protocol mocks/fakes.
 
 Unit tests of View States focus on validating screen element changes and, when done correctly, avoid the complexities of use cases or mocked system resources
 
