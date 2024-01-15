@@ -32,17 +32,18 @@ enum ChuckNorrisIoRequest {
 
     /// The full path URL for the request.
     var url: URL {
-        return switch self {
+        switch self {
         case .getRandomJoke(let category):
+            var requestUrl = Self.baseUrl.appending(path: "jokes/random")
+
             if let category = category {
-                Self.baseUrl.appending(path: "jokes/random?category=\(category)")
-            }
-            else {
-                Self.baseUrl.appending(path: "jokes/random")
+                requestUrl.append(queryItems: [URLQueryItem(name: "category", value: category)])
             }
 
+            return requestUrl
+
         case .getCategories:
-            Self.baseUrl.appending(path: "jokes/categories")
+            return Self.baseUrl.appending(path: "jokes/categories")
         }
     }
 }

@@ -21,6 +21,7 @@ class AppUrlSession: AppUrlSessionHandling {
 
         do {
             // Make the web request and parse the response.
+            Logger.api.trace("GET \(url.absoluteString)")
             response = try await session.data(for: urlRequest, delegate: nil)
         }
         catch {
@@ -38,18 +39,19 @@ class AppUrlSession: AppUrlSessionHandling {
 private extension AppUrlSession {
 
     func parse<Model: Decodable>(_ data: Data, urlResponse: URLResponse) throws -> Model {
+        let requestUrlString = urlResponse.url?.absoluteString ?? "nil URL"
         guard let urlResponse = urlResponse as? HTTPURLResponse else {
-            Logger.api.critical("The received URLResponse as not an HTTPURLResponse. \(urlResponse)")
-            throw RequestError.unexpected("HTTPURLResponse was expected")
+            Logger.api.critical("The received URLResponse as not an HTTPURLResponse: \(urlResponse) for \(requestUrlString)")
+            throw RequestError.unexpected("HTTPURLResponse type was expected")
         }
 
         guard 200...299 ~= urlResponse.statusCode else {
-            Logger.api.error("Failure response code: \(urlResponse.statusCode)")
+            Logger.api.error("Failure response code: \(urlResponse.statusCode) for \(requestUrlString)")
             throw RequestError.serverResponse(code: urlResponse.statusCode)
         }
 
         guard !data.isEmpty else {
-            Logger.api.error("API request succeeded but the response data is empty")
+            Logger.api.error("API request succeeded but the response data is empty for \(requestUrlString)")
             throw RequestError.unexpected("API request succeeded but the response data is empty")
         }
 

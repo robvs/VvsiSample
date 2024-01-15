@@ -6,8 +6,6 @@ import SwiftUI
 struct CategoryView: View {
     @ObservedObject var viewState: CategoryViewState
 
-    private let jokes = ["Chuck Norris joke 1.", "Chuck Norris joke 2.", "Chuck Norris joke 3."]
-
     var body: some View {
         VStack(alignment: .leading) {
             Text("Random \(viewState.categoryName) Jokes")
@@ -15,7 +13,7 @@ struct CategoryView: View {
 
             ScrollView {
                 VStack(spacing: 16) {
-                    ForEach(jokes, id: \.self) { joke in
+                    ForEach(viewState.categoryJokes, id: \.self) { joke in
                        row(with: joke)
                     }
                 }

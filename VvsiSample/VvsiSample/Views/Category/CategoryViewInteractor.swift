@@ -8,6 +8,8 @@ import OSLog
 class CategoryViewInteractor: ViewInteractorBase<CategoryViewState, CategoryViewInteractor.NavigationEvent>,
                               ObservableObject {
 
+    static let jokeCount = 5
+
     // MARK: Navigation Events
 
     /// Navigation events that are emitted by this object. These are typically
@@ -35,7 +37,7 @@ class CategoryViewInteractor: ViewInteractorBase<CategoryViewState, CategoryView
         listenForEvents()
 
         // initiate the api calls.
-        startFetchOfRandomJokes()
+        startFetchOfRandomJokes(for: viewState.categoryName)
     }
 }
 
@@ -75,9 +77,8 @@ private extension CategoryViewInteractor {
     func handle(event: CategoryViewState.Event) async {
         switch event {
         case .refreshButtonPressed:
-//            await viewState.set(state: .loading(includesRandomJoke: true,
-//                                                includesCategories: viewState.currentState.isLoadingCategories))
-            startFetchOfRandomJokes()
+            await viewState.set(state: .loading(categoryName: viewState.categoryName))
+            startFetchOfRandomJokes(for: viewState.categoryName)
         }
     }
 }
@@ -87,24 +88,34 @@ private extension CategoryViewInteractor {
 
 private extension CategoryViewInteractor {
 
-    func startFetchOfRandomJokes() {
+    func startFetchOfRandomJokes(for category: String) {
         randomJokesTask = Task { @MainActor in
-//            do {
-//                let joke: ChuckNorrisJoke = try await session.get(from: ChuckNorrisIoRequest.getRandomJoke().url)
-//                try Task.checkCancellation()
-//                await viewState.update(randomJoke: joke.value)
-//            }
-//            catch let requestError as AppUrlSession.RequestError {
-//                let errorMessage = "Retrieval of a random joke failed (\(requestError.code))"
-//                await viewState.update(randomJoke: nil, errorMessage: errorMessage)
-//            }
-//            catch _ as CancellationError {
-//                // nothing to do here. cancellation is normal (i.e. because the view disappeared).
-//            }
-//            catch {
-//                let errorMessage = "An unexpected error occurred: (\(error.localizedDescription))"
-//                await viewState.update(randomJoke: nil, errorMessage: errorMessage)
-//            }
+            // fetch a set of random category jokes
+            var jokes: [String] = []
+
+            do {
+                for _ in 0..<Self.jokeCount {
+                    let jokeUrl = ChuckNorrisIoRequest.getRandomJoke(category: category).url
+                    let joke: ChuckNorrisJoke = try await session.get(from: jokeUrl)
+                    try Task.checkCancellation()
+
+                    jokes.append(joke.value)
+                }
+
+                Logger.view.trace("Update Category view with: \(jokes)")
+                await viewState.set(state: .ready(categoryJokes: jokes))
+            }
+            catch let requestError as AppUrlSession.RequestError {
+                let errorMessage = "Retrieval of a random category joke failed (\(requestError.code))"
+                await viewState.set(state: .error(message: errorMessage))
+            }
+            catch _ as CancellationError {
+                // nothing to do here. cancellation is normal (i.e. because the view disappeared).
+            }
+            catch {
+                let errorMessage = "An unexpected error occurred: (\(error.localizedDescription))"
+                await viewState.set(state: .error(message: errorMessage))
+            }
         }
     }
 
