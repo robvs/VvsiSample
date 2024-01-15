@@ -4,13 +4,13 @@
 import SwiftUI
 
 struct CategoryView: View {
-    let selectedCategory: String
+    @ObservedObject var viewState: CategoryViewState
 
     private let jokes = ["Chuck Norris joke 1.", "Chuck Norris joke 2.", "Chuck Norris joke 3."]
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Random \(selectedCategory) Jokes")
+            Text("Random \(viewState.categoryName) Jokes")
                 .appTitle2()
 
             ScrollView {
@@ -26,7 +26,7 @@ struct CategoryView: View {
         }
         .padding(.top, 8)
         .padding(.horizontal, 16)
-        .navigationTitle(selectedCategory.capitalized)
+        .navigationTitle(viewState.categoryName.capitalized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -61,11 +61,11 @@ private extension CategoryView {
 // MARK: - Previews
 
 #Preview("Light") {
-    CategoryView(selectedCategory: "Category 1")
+    CategoryView(viewState: CategoryViewState(categoryName: "Category 1"))
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
-    CategoryView(selectedCategory: "Category 1")
+    CategoryView(viewState: CategoryViewState(categoryName: "Category 1"))
         .preferredColorScheme(.dark)
 }

@@ -2,6 +2,7 @@
 //
 
 import Foundation
+import OSLog
 
 /// This is a wrapper around URLSession that provides a simplified API specific to this app.
 class AppUrlSession: AppUrlSessionHandling {
@@ -23,6 +24,7 @@ class AppUrlSession: AppUrlSessionHandling {
             response = try await session.data(for: urlRequest, delegate: nil)
         }
         catch {
+            Logger.api.error("session.data() threw an error: \(error.localizedDescription)")
             throw RequestError.unexpectedError(error)
         }
 
@@ -37,14 +39,17 @@ private extension AppUrlSession {
 
     func parse<Model: Decodable>(_ data: Data, urlResponse: URLResponse) throws -> Model {
         guard let urlResponse = urlResponse as? HTTPURLResponse else {
+            Logger.api.critical("The received URLResponse as not an HTTPURLResponse. \(urlResponse)")
             throw RequestError.unexpected("HTTPURLResponse was expected")
         }
 
         guard 200...299 ~= urlResponse.statusCode else {
+            Logger.api.error("Failure response code: \(urlResponse.statusCode)")
             throw RequestError.serverResponse(code: urlResponse.statusCode)
         }
 
         guard !data.isEmpty else {
+            Logger.api.error("API request succeeded but the response data is empty")
             throw RequestError.unexpected("API request succeeded but the response data is empty")
         }
 
@@ -55,10 +60,12 @@ private extension AppUrlSession {
             return try decoder.decode(Model.self, from: data)
         }
         catch let decodingError as DecodingError {
+            let dataString = String(data: data, encoding: .utf8) ?? ""
+            Logger.api.error("Data could not be decoded: \(dataString)")
             throw RequestError.unexpectedError(decodingError)
         }
         catch {
-            print("Unexpected error type: \(error)")
+            Logger.api.error("Unexpected error type: \(error)")
             throw RequestError.unexpectedError(error)
         }
     }

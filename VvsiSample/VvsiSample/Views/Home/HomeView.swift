@@ -1,13 +1,15 @@
 //  Copyright © 2024 Rob Vander Sloot
 //
 
+import OSLog
 import SwiftUI
 
 struct HomeView: View {
+    @EnvironmentObject var navigationState: NavigationState
     @ObservedObject var viewState: HomeViewState
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationState.path) {
             VStack(alignment: .leading, spacing: 16) {
                 header()
 
@@ -18,6 +20,12 @@ struct HomeView: View {
             .padding(.horizontal)
             .navigationTitle("Home")
             .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(for: MainCoordinator.Link.self) { link in
+                switch link {
+                case .category(let pathData):
+                    CategoryView(viewState: pathData.viewState)
+                }
+            }
         }
     }
 }
@@ -54,7 +62,7 @@ private extension HomeView {
     }
 
     func randomJoke() -> some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text("Random Joke")
                     .appTitle2()
@@ -63,11 +71,10 @@ private extension HomeView {
 
                 Image(systemName: "arrow.clockwise")
                     .foregroundStyle(viewState.refreshButtonDisabled ? .appOnSurfaceDisabled : .appTextLink)
-                    .padding(4)
+                    .disabled(viewState.refreshButtonDisabled)
                     .onTapGesture {
                         viewState.on(event: .refreshButtonPressed)
                     }
-                    .disabled(viewState.refreshButtonDisabled)
             }
 
             error(message: viewState.randomJokeError)
@@ -88,7 +95,7 @@ private extension HomeView {
     }
 
     func categories() -> some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 4) {
             Text("Categories")
                 .appTitle2()
 
@@ -98,9 +105,10 @@ private extension HomeView {
                 VStack(alignment: .leading, spacing: 0) {
                     if let categoryNames = viewState.categories {
                         ForEach(categoryNames, id: \.self) { categoryName in
-                            NavigationLink(value: categoryName) {
-                                HomeCategoryListRow(categoryName: categoryName)
-                            }
+                            HomeCategoryListRow(categoryName: categoryName)
+                                .onTapGesture {
+                                    viewState.on(event: .categorySelected(name: categoryName))
+                                }
                         }
                     }
                     else {
@@ -114,9 +122,6 @@ private extension HomeView {
                 }
                 .padding(.horizontal)
             }
-        }
-        .navigationDestination(for: String.self) { selectedCategory in
-            CategoryView(selectedCategory: selectedCategory)
         }
     }
 
@@ -143,7 +148,7 @@ private extension HomeView {
     let viewState = HomeViewState()
     return HomeView(viewState: viewState)
         .task {
-            await viewState.set(state: .updateRandomJoke(randomJoke))
+            await viewState.update(randomJoke: randomJoke)
         }
         .preferredColorScheme(.light)
 }
@@ -152,7 +157,7 @@ private extension HomeView {
     let viewState = HomeViewState()
     return HomeView(viewState: viewState)
         .task {
-            await viewState.set(state: .updateCategories(categoryNames))
+            await viewState.update(categories: categoryNames)
         }
         .preferredColorScheme(.light)
 }
@@ -161,8 +166,8 @@ private extension HomeView {
     let viewState = HomeViewState()
     return HomeView(viewState: viewState)
         .task {
-            await viewState.set(state: .updateRandomJoke(randomJoke))
-            await viewState.set(state: .updateCategories(categoryNames))
+            await viewState.update(randomJoke: randomJoke)
+            await viewState.update(categories: categoryNames)
         }
         .preferredColorScheme(.light)
 }
@@ -171,14 +176,24 @@ private extension HomeView {
     let viewState = HomeViewState()
     return HomeView(viewState: viewState)
         .task {
-            await viewState.set(state: .updateRandomJoke(nil, errorMessage: "There was a random joke error."))
-            await viewState.set(state: .updateCategories(nil, errorMessage: "There was a category error."))
+            await viewState.update(randomJoke: nil, errorMessage: "There was a random joke error.")
+            await viewState.update(categories: nil, errorMessage: "There was a category error.")
         }
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
     return HomeView(viewState: HomeViewState())
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Dark Errors") {
+    let viewState = HomeViewState()
+    return HomeView(viewState: viewState)
+        .task {
+            await viewState.update(randomJoke: nil, errorMessage: "There was a random joke error.")
+            await viewState.update(categories: nil, errorMessage: "There was a category error.")
+        }
         .preferredColorScheme(.dark)
 }
 

@@ -2,6 +2,7 @@
 //
 
 import Combine
+import OSLog
 import SwiftUI
 
 typealias HomeViewStateBase = ViewStateBase<HomeViewState.State, 
@@ -17,22 +18,6 @@ class HomeViewState: HomeViewStateBase {
         /// Indicates that one or more items are being loaded.
         case loading(includesRandomJoke: Bool, includesCategories: Bool)
 
-        /// Update the random joke to the given value.
-        /// NOTE: This does not change `currentState` to `updateRandomJoke`. If both random
-        /// joke and categories are loaded with this update, `currentState` changes to `ready`.
-        /// - parameters:
-        ///  - joke: The joke to be displayed. `nil` indicates loading or error.
-        ///  - errorMessage: The error message to be displayed.
-        case updateRandomJoke(_ joke: String?, errorMessage: String? = nil)
-
-        /// Update the categories to the given set.
-        /// NOTE: This does not change `currentState` to `updateRandomJoke`. If both random
-        /// joke and categories are loaded with this update, `currentState` changes to `ready`.
-        /// - parameters:
-        ///  - categories: The categories to be listed. `nil` indicates loading or error.
-        ///  - errorMessage: The error message to be displayed.
-        case updateCategories(_ categories: [String]?, errorMessage: String? = nil)
-
         /// Indicates that loading is complete and the view is ready.
         case ready
     }
@@ -42,14 +27,15 @@ class HomeViewState: HomeViewStateBase {
     /// Events emitted by the view & republished/forwarded by this view state.
     enum Event {
         case refreshButtonPressed
+        case categorySelected(name: String)
     }
 
     // MARK: Published values
     // use `private (set)` to enforce use of `set(state:)` to change published values.
 
-    @Published private (set) var randomJoke: String?      // nil indicates loading
+    @Published private (set) var randomJoke: String?
     @Published private (set) var randomJokeError: String?
-    @Published private (set) var categories: [String]?    // nil indicates loading
+    @Published private (set) var categories: [String]?
     @Published private (set) var categoriesError: String?
     @Published private (set) var refreshButtonDisabled: Bool = true
 
@@ -59,43 +45,50 @@ class HomeViewState: HomeViewStateBase {
         let initialState: State = .loading(includesRandomJoke: true, includesCategories: true)
         super.init(with: initialState, updateAction: Self.updateProperties)
     }
+}
 
-    // MARK: ViewStateBase overrides
 
-    /// This override captures `updateRandomJoke` and `updateCategories` states
-    /// in order to update the respective properties without changing `currentState` until
-    /// loading of both is complete.
+// MARK: - Public methods
+
+extension HomeViewState {
+
+    /// Update the random joke to the given value or set the random joke's error message.
+    ///
+    /// This may result in a change to `currentState`.
+    /// - parameters:
+    ///  - randomJoke: The joke to be displayed. If `errorMessage` is nil, this should not be.
+    ///  - errorMessage: The error message to be displayed.
     @MainActor
-    override func set(state: ViewStateBase<State, Event>.State) async {
-        switch state {
-        case .updateRandomJoke(let randomJoke, let errorMessage):
-            if let errorMessage = errorMessage {
-                self.randomJoke = nil
-                randomJokeError = errorMessage
-            }
-            else {
-                self.randomJoke = randomJoke
-            }
+    func update(randomJoke: String?, errorMessage: String? = nil) async {
+        self.randomJoke = errorMessage == nil ? randomJoke : nil
+        randomJokeError = errorMessage
 
-            if areCategoriesLoading == false {
-                await super.set(state: .ready)
-            }
+        if currentState.isLoadingCategories {
+            // the random joke is finished loading but categories aren't.
+            await set(state: .loading(includesRandomJoke: false, includesCategories: true))
+        }
+        else {
+            await set(state: .ready)
+        }
+    }
 
-        case .updateCategories(let categories, let errorMessage):
-            if let errorMessage = errorMessage {
-                self.categories = nil
-                categoriesError = errorMessage
-            }
-            else {
-                self.categories = categories
-            }
+    /// Update the categories to the given value or set the categories' error message.
+    ///
+    /// This may result in a change to `currentState`.
+    /// - parameters:
+    ///  - categories: The categories to be displayed. If `errorMessage` is nil, this should not be.
+    ///  - errorMessage: The error message to be displayed.
+    @MainActor
+    func update(categories: [String]?, errorMessage: String? = nil) async {
+        self.categories = errorMessage == nil ? categories : nil
+        categoriesError = errorMessage
 
-            if isRandomJokeLoading == false {
-                await super.set(state: .ready)
-            }
-
-        default:
-            await super.set(state: state)
+        if currentState.isLoadingRandomJoke {
+            // categories are finished loading but the random joke isn't.
+            await set(state: .loading(includesRandomJoke: true, includesCategories: false))
+        }
+        else {
+            await set(state: .ready)
         }
     }
 }
@@ -117,6 +110,7 @@ private extension HomeViewState {
         guard let viewState = viewState as? HomeViewState else {
             // the given view state could not be converted to the expected type.
             // This should never happen.
+            Logger.view.fault("viewState could not be converted to HomeViewState.")
             return
         }
 
@@ -124,25 +118,41 @@ private extension HomeViewState {
         case .loading(let includesRandomJoke, let includesCategories):
             if includesRandomJoke {
                 viewState.randomJoke = nil
+                viewState.randomJokeError = nil
+                viewState.refreshButtonDisabled = true
             }
 
             if includesCategories {
                 viewState.categories = nil
+                viewState.categoriesError = nil
             }
-
-        case .updateRandomJoke:
-            // this function should never be called with this state
-            break
-
-        case .updateCategories:
-            // this function should never be called with this state
-            break
 
         case .ready:
             viewState.refreshButtonDisabled = false
         }
     }
+}
 
-    var isRandomJokeLoading: Bool  { randomJoke == nil }
-    var areCategoriesLoading: Bool { categories == nil }
+
+// MARK: - State Helpers
+
+extension HomeViewState.State {
+
+    var isLoadingRandomJoke: Bool {
+        return if case .loading(let includesRandomJoke, _) = self {
+            includesRandomJoke
+        }
+        else {
+            false
+        }
+    }
+
+    var isLoadingCategories: Bool {
+        return if case .loading(_, let includesCategories) = self {
+            includesCategories
+        }
+        else {
+            false
+        }
+    }
 }

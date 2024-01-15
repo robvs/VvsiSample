@@ -5,11 +5,12 @@ import SwiftUI
 
 @main
 struct VvsiSampleApp: App {
-    @StateObject var homeViewInteractor = HomeViewInteractor(viewState: HomeViewState(),
-                                                             session: AppUrlSession.shared)
+    let mainCoordinator = MainCoordinator()
+
     var body: some Scene {
         WindowGroup {
-            HomeView(viewState: homeViewInteractor.viewState)
+            HomeView(viewState: mainCoordinator.homeViewState)
+                .environmentObject(mainCoordinator.navigationState)
         }
     }
 }

@@ -10,12 +10,10 @@ enum ViewLifeCycleEvent {
 }
 
 /// Base class for view state objects. Provides functionality that is common to all view states.
-class ViewStateBase<S, ET>: ObservableObject {
+class ViewStateBase<State, EventType>: ObservableObject {
 
-    // type-aliases for the ViewStateProtocol's associated types
-    typealias State = S
-    typealias EventType = ET
-    typealias UpdateAction = (ViewStateBase<S, ET>, S) -> Void
+    // type-aliases helper
+    typealias UpdateAction = (ViewStateBase<State, EventType>, State) -> Void
 
     // MARK: Public properties
 
@@ -34,7 +32,7 @@ class ViewStateBase<S, ET>: ObservableObject {
     // MARK: private properties
 
     private (set) var didLoad = false
-    private let updateAction: (ViewStateBase<S, ET>, S) -> Void
+    private let updateAction: UpdateAction
     private var cancellables: [Combine.AnyCancellable] = []
 
     // event subjects that are used to send new events to the event publishers.
