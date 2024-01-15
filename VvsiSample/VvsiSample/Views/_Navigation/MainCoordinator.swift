@@ -5,17 +5,18 @@ import Combine
 import Foundation
 import OSLog
 
-/// Provides navigation coordinations for the app's root landing screen (e.g. home screen).
+/// Provides navigation coordination for the app's root landing screen (e.g. home screen).
 class MainCoordinator {
 
     /// Screens to which this coordinator navigates.
     ///
-    /// Note that `ViewInteractor`s are used as the path data in order to keep them
-    /// in scope while their associated view is on the nav stack and to cause them to go
-    /// out of scope (e.g. deinit) when their associated view is removed from the nav stack.
+    /// Note that `ViewInteractor`s are typically used as the path data in order to keep
+    /// an instance in scope while its associated view is on the nav stack. This also causes
+    /// the instance to go out of scope when its associated view is removed from the nav
+    /// stack, thus freeing its memory.
     enum Link {
-        /// Navigation to the Category screen
-        case category(pathData: any ViewInteracting<CategoryViewState>)
+        /// Category screen
+        case category(pathData: any NavigationPathable<CategoryViewState>)
     }
 
     /// This is injected as an environment object on the home screen to
@@ -30,7 +31,21 @@ class MainCoordinator {
 
     init() {
         homeViewInteractor = Self.createHomeViewInteractor()
+        listenForNavigationEvents(on: homeViewInteractor)
+    }
+}
 
+
+// MARK: - Private Helpers
+
+private extension MainCoordinator {
+
+    static func createHomeViewInteractor() -> HomeViewInteractor {
+        return HomeViewInteractor(viewState: HomeViewState(), 
+                                  session: AppUrlSession.shared)
+    }
+
+    func listenForNavigationEvents(on homeViewInteractor: HomeViewInteractor) {
         homeViewInteractor.navigationEventPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
@@ -53,24 +68,13 @@ class MainCoordinator {
 }
 
 
-// MARK: - Private Helpers
-
-private extension MainCoordinator {
-
-    static func createHomeViewInteractor() -> HomeViewInteractor {
-        return HomeViewInteractor(viewState: HomeViewState(), 
-                                  session: AppUrlSession.shared)
-    }
-}
-
-
 // MARK: - Link extensions
 
-// Hashable conformance is needed to help with `NavigationPathing`.
+// Hashable conformance is needed to help with `NavigationPath` compatibility.
 extension MainCoordinator.Link: Hashable {
 
     /// Convenience property that provides the ViewInteractor that is associated with a given Link.
-    var pathData: any ViewInteracting<CategoryViewState> {
+    var pathData: any NavigationPathable<CategoryViewState> {
         switch self {
         case .category(let pathData):
             return pathData

@@ -20,7 +20,6 @@ class AppUrlSession: AppUrlSessionHandling {
         let response: (data: Data, urlResponse: URLResponse)
 
         do {
-            // Make the web request and parse the response.
             Logger.api.trace("GET \(url.absoluteString)")
             response = try await session.data(for: urlRequest, delegate: nil)
         }

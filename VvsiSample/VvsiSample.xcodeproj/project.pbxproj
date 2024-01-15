@@ -10,11 +10,10 @@
 		7F308B4E2B1ED679009682EB /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F308B4D2B1ED679009682EB /* Image.swift */; };
 		7F5684D92B5477EE00BAFDE9 /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684D82B5477EE00BAFDE9 /* MainCoordinator.swift */; };
 		7F5684DB2B54813200BAFDE9 /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684DA2B54813200BAFDE9 /* NavigationState.swift */; };
-		7F5684DD2B54851200BAFDE9 /* NavigationPathing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684DC2B54851200BAFDE9 /* NavigationPathing.swift */; };
 		7F5684DF2B5488DE00BAFDE9 /* CategoryViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684DE2B5488DE00BAFDE9 /* CategoryViewState.swift */; };
 		7F5684E12B54BB4600BAFDE9 /* CategoryViewInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684E02B54BB4600BAFDE9 /* CategoryViewInteractor.swift */; };
 		7F5684E32B54D88800BAFDE9 /* ViewInteractorBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684E22B54D88800BAFDE9 /* ViewInteractorBase.swift */; };
-		7F5684E52B557C9F00BAFDE9 /* ViewInteracting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684E42B557C9F00BAFDE9 /* ViewInteracting.swift */; };
+		7F5684E52B557C9F00BAFDE9 /* NavigationPathable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684E42B557C9F00BAFDE9 /* NavigationPathable.swift */; };
 		7F65F99F2B4A68B1007E6F2C /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F65F99E2B4A68B1007E6F2C /* Logger.swift */; };
 		7F87BFDC2B2C02E3000F6251 /* HomeCategoryListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F87BFDB2B2C02E3000F6251 /* HomeCategoryListRow.swift */; };
 		7F87BFDF2B30DA14000F6251 /* CategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F87BFDE2B30DA14000F6251 /* CategoryView.swift */; };
@@ -59,11 +58,10 @@
 		7F308B4D2B1ED679009682EB /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
 		7F5684D82B5477EE00BAFDE9 /* MainCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCoordinator.swift; sourceTree = "<group>"; };
 		7F5684DA2B54813200BAFDE9 /* NavigationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationState.swift; sourceTree = "<group>"; };
-		7F5684DC2B54851200BAFDE9 /* NavigationPathing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPathing.swift; sourceTree = "<group>"; };
 		7F5684DE2B5488DE00BAFDE9 /* CategoryViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewState.swift; sourceTree = "<group>"; };
 		7F5684E02B54BB4600BAFDE9 /* CategoryViewInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewInteractor.swift; sourceTree = "<group>"; };
 		7F5684E22B54D88800BAFDE9 /* ViewInteractorBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewInteractorBase.swift; sourceTree = "<group>"; };
-		7F5684E42B557C9F00BAFDE9 /* ViewInteracting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewInteracting.swift; sourceTree = "<group>"; };
+		7F5684E42B557C9F00BAFDE9 /* NavigationPathable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPathable.swift; sourceTree = "<group>"; };
 		7F65F99E2B4A68B1007E6F2C /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		7F87BFDB2B2C02E3000F6251 /* HomeCategoryListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCategoryListRow.swift; sourceTree = "<group>"; };
 		7F87BFDE2B30DA14000F6251 /* CategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryView.swift; sourceTree = "<group>"; };
@@ -143,8 +141,8 @@
 			isa = PBXGroup;
 			children = (
 				7F5684D82B5477EE00BAFDE9 /* MainCoordinator.swift */,
+				7F5684E42B557C9F00BAFDE9 /* NavigationPathable.swift */,
 				7F5684DA2B54813200BAFDE9 /* NavigationState.swift */,
-				7F5684DC2B54851200BAFDE9 /* NavigationPathing.swift */,
 			);
 			path = _Navigation;
 			sourceTree = "<group>";
@@ -233,7 +231,6 @@
 			isa = PBXGroup;
 			children = (
 				7FE20FF02B3F4B020087FAA5 /* ViewStateBase.swift */,
-				7F5684E42B557C9F00BAFDE9 /* ViewInteracting.swift */,
 				7F5684E22B54D88800BAFDE9 /* ViewInteractorBase.swift */,
 			);
 			path = _Helpers;
@@ -416,7 +413,7 @@
 				7FE20FF52B3F612D0087FAA5 /* HomeViewState.swift in Sources */,
 				7F5684D92B5477EE00BAFDE9 /* MainCoordinator.swift in Sources */,
 				7F5684E12B54BB4600BAFDE9 /* CategoryViewInteractor.swift in Sources */,
-				7F5684E52B557C9F00BAFDE9 /* ViewInteracting.swift in Sources */,
+				7F5684E52B557C9F00BAFDE9 /* NavigationPathable.swift in Sources */,
 				7FE20FFF2B47A7550087FAA5 /* HomeViewInteractor.swift in Sources */,
 				7F65F99F2B4A68B1007E6F2C /* Logger.swift in Sources */,
 				7FE20FFD2B47A5C90087FAA5 /* ChuckNorrisJoke.swift in Sources */,
@@ -424,7 +421,6 @@
 				7F87BFDC2B2C02E3000F6251 /* HomeCategoryListRow.swift in Sources */,
 				7F5684DF2B5488DE00BAFDE9 /* CategoryViewState.swift in Sources */,
 				7F87BFDF2B30DA14000F6251 /* CategoryView.swift in Sources */,
-				7F5684DD2B54851200BAFDE9 /* NavigationPathing.swift in Sources */,
 				7FE20FF12B3F4B020087FAA5 /* ViewStateBase.swift in Sources */,
 				7FE20FF82B40C4DF0087FAA5 /* ChuckNorrisIoRequest.swift in Sources */,
 				7FE20FF32B3F54A90087FAA5 /* AppAlert.swift in Sources */,

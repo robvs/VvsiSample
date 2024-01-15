@@ -6,19 +6,18 @@ import OSLog
 
 /// Base class for view interactors, which handle interactions between a view and the
 /// rest of the system.
-class ViewInteractorBase<ViewState, NavigationEvent>: ViewInteracting {
+class ViewInteractorBase<ViewState, NavigationEvent>: NavigationPathable {
 
+    /// Manages the dynamic elements of a view as well as user interactions.
     let viewState: ViewState
 
     /// Publishes navigation notifications.
     let navigationEventPublisher: AnyPublisher<NavigationEvent, Never>
-    private let navigationEventSubject: PassthroughSubject<NavigationEvent, Never>
 
-    init(viewState: ViewState) {
+    init(viewState: ViewState,
+         navigationEventPublisher: AnyPublisher<NavigationEvent, Never>) {
         self.viewState = viewState
-
-        navigationEventSubject = PassthroughSubject<NavigationEvent, Never>()
-        navigationEventPublisher = navigationEventSubject.eraseToAnyPublisher()
+        self.navigationEventPublisher = navigationEventPublisher
     }
 }
 

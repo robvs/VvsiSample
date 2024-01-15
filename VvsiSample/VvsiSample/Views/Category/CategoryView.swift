@@ -3,6 +3,7 @@
 
 import SwiftUI
 
+/// Displays a set of random jokes for a specific category.
 struct CategoryView: View {
     @ObservedObject var viewState: CategoryViewState
 

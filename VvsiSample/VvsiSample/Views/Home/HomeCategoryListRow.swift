@@ -3,6 +3,7 @@
 
 import SwiftUI
 
+/// Layout for a single row in the category list on the Home screen.
 struct HomeCategoryListRow: View {
 
     let categoryName: String

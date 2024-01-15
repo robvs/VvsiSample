@@ -7,6 +7,7 @@ import SwiftUI
 typealias CategoryViewStateBase = ViewStateBase<CategoryViewState.State,
                                                 CategoryViewState.Event>
 
+/// Manage view state for the Category screen.
 class CategoryViewState: CategoryViewStateBase {
 
     // MARK: State definition
@@ -14,7 +15,7 @@ class CategoryViewState: CategoryViewStateBase {
     /// Available view states.
     enum State: Equatable {
         /// Indicates that one or more items are being loaded.
-        case loading(categoryName: String)
+        case loading
 
         /// Indicates that an error occurred.
         case error(message: String)
@@ -33,16 +34,21 @@ class CategoryViewState: CategoryViewStateBase {
     // MARK: Published values
     // use `private (set)` to enforce use of `set(state:)` to change published values.
 
-    @Published private (set) var categoryName: String = ""
     @Published private (set) var categoryJokes: [String] = []
     @Published private (set) var errorMessage: String?
     @Published private (set) var refreshButtonDisabled: Bool = true
 
+    // MARK: Properties
+
+    // note: even though this is used by the view, it is not `@Published`
+    //       because its value does not change.
+    let categoryName: String
+
     // MARK: Object lifecycle
 
     init(categoryName: String) {
-        let initialState: State = .loading(categoryName: categoryName)
-        super.init(with: initialState, updateAction: Self.updateProperties)
+        self.categoryName = categoryName
+        super.init(with: .loading, updateAction: Self.updateProperties)
     }
 }
 
@@ -68,8 +74,7 @@ private extension CategoryViewState {
         }
 
         switch state {
-        case .loading(let categoryName):
-            viewState.categoryName = categoryName
+        case .loading:
             viewState.categoryJokes = []
             viewState.errorMessage = nil
             viewState.refreshButtonDisabled = true
@@ -83,19 +88,5 @@ private extension CategoryViewState {
             viewState.errorMessage = nil
             viewState.refreshButtonDisabled = false
         }
-    }
-}
-
-
-// MARK: - Hashable conformance
-// Hashable conformance is needed to help with `NavigationPathing`.
-extension CategoryViewState: Hashable {
-
-    static func == (lhs: CategoryViewState, rhs: CategoryViewState) -> Bool {
-        return lhs.categoryName == rhs.categoryName
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(categoryName)
     }
 }

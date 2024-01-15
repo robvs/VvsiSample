@@ -4,7 +4,7 @@
 import Combine
 import OSLog
 
-/// Handle interactions between the Home screen (e.g. `HomeViewState`) and the backend.
+/// Handle interactions between the Category screen (e.g. `CategoryViewState`) and the backend.
 class CategoryViewInteractor: ViewInteractorBase<CategoryViewState, CategoryViewInteractor.NavigationEvent>,
                               ObservableObject {
 
@@ -18,6 +18,8 @@ class CategoryViewInteractor: ViewInteractorBase<CategoryViewState, CategoryView
         case dismiss
     }
 
+    private let navigationEventSubject: PassthroughSubject<NavigationEvent, Never>
+
     // MARK: Properties
 
     private let session: AppUrlSessionHandling
@@ -29,9 +31,11 @@ class CategoryViewInteractor: ViewInteractorBase<CategoryViewState, CategoryView
     init(viewState: CategoryViewState, session: AppUrlSessionHandling) {
         // initialize stored properties
         self.session = session
+        navigationEventSubject = PassthroughSubject<NavigationEvent, Never>()
 
         // initialize base class
-        super.init(viewState: viewState)
+        super.init(viewState: viewState,
+                   navigationEventPublisher: navigationEventSubject.eraseToAnyPublisher())
 
         // listen for events from the view state.
         listenForEvents()
@@ -77,7 +81,7 @@ private extension CategoryViewInteractor {
     func handle(event: CategoryViewState.Event) async {
         switch event {
         case .refreshButtonPressed:
-            await viewState.set(state: .loading(categoryName: viewState.categoryName))
+            await viewState.set(state: .loading)
             startFetchOfRandomJokes(for: viewState.categoryName)
         }
     }
@@ -90,16 +94,18 @@ private extension CategoryViewInteractor {
 
     func startFetchOfRandomJokes(for category: String) {
         randomJokesTask = Task { @MainActor in
-            // fetch a set of random category jokes
             var jokes: [String] = []
 
             do {
+                // fetch a set of random category jokes
                 for _ in 0..<Self.jokeCount {
                     let jokeUrl = ChuckNorrisIoRequest.getRandomJoke(category: category).url
                     let joke: ChuckNorrisJoke = try await session.get(from: jokeUrl)
                     try Task.checkCancellation()
 
-                    jokes.append(joke.value)
+                    if !jokes.contains(where: { $0 == joke.value }) {
+                        jokes.append(joke.value)
+                    }
                 }
 
                 Logger.view.trace("Update Category view with: \(jokes)")

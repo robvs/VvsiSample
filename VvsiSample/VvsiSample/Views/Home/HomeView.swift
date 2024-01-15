@@ -4,6 +4,7 @@
 import OSLog
 import SwiftUI
 
+/// Displays a random joke and a list of available categories.
 struct HomeView: View {
     @EnvironmentObject var navigationState: NavigationState
     @ObservedObject var viewState: HomeViewState

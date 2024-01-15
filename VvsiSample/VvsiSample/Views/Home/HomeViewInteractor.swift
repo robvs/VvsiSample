@@ -5,10 +5,8 @@ import Combine
 import OSLog
 
 /// Handle interactions between the Home screen (e.g. `HomeViewState`) and the backend.
-class HomeViewInteractor: NavigationPathing, ObservableObject {
-
-    /// Manages view state changes for the home screen.
-    let viewState: HomeViewState
+class HomeViewInteractor: ViewInteractorBase<HomeViewState, HomeViewInteractor.NavigationEvent>,
+                          ObservableObject {
 
     // MARK: Navigation Events
 
@@ -19,8 +17,6 @@ class HomeViewInteractor: NavigationPathing, ObservableObject {
         case dismiss
     }
 
-    /// Publishes navigation notifications.
-    let navigationEventPublisher: AnyPublisher<NavigationEvent, Never>
     private let navigationEventSubject: PassthroughSubject<NavigationEvent, Never>
 
     // MARK: Properties
@@ -33,11 +29,13 @@ class HomeViewInteractor: NavigationPathing, ObservableObject {
     // MARK: Object life cycle
 
     init(viewState: HomeViewState, session: AppUrlSessionHandling) {
-        self.viewState = viewState
+        // initialize stored properties
         self.session = session
-
         navigationEventSubject = PassthroughSubject<NavigationEvent, Never>()
-        navigationEventPublisher = navigationEventSubject.eraseToAnyPublisher()
+
+        // initialize base class
+        super.init(viewState: viewState,
+                   navigationEventPublisher: navigationEventSubject.eraseToAnyPublisher())
 
         // listen for events from the view state.
         listenForEvents()
