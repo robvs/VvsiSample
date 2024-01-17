@@ -34,6 +34,7 @@ class CategoryViewState: CategoryViewStateBase {
     // MARK: Published values
     // use `private (set)` to enforce use of `set(state:)` to change published values.
 
+    @Published private (set) var isLoading: Bool = true
     @Published private (set) var categoryJokes: [String] = []
     @Published private (set) var errorMessage: String?
     @Published private (set) var refreshButtonDisabled: Bool = true
@@ -75,15 +76,18 @@ private extension CategoryViewState {
 
         switch state {
         case .loading:
+            viewState.isLoading = true
             viewState.categoryJokes = []
             viewState.errorMessage = nil
             viewState.refreshButtonDisabled = true
 
         case .error(let message):
+            viewState.isLoading = false
             viewState.errorMessage = message
             viewState.refreshButtonDisabled = false
 
         case .ready(let categoryJokes):
+            viewState.isLoading = false
             viewState.categoryJokes = categoryJokes
             viewState.errorMessage = nil
             viewState.refreshButtonDisabled = false

@@ -7,24 +7,37 @@ import SwiftUI
 struct CategoryView: View {
     @ObservedObject var viewState: CategoryViewState
 
+    private let placeHolderText = "If Chuck Norris goes to Z'ha'dum, he would not die."
+
     var body: some View {
         VStack(alignment: .leading) {
             Text("Random \(viewState.categoryName) Jokes")
                 .appTitle2()
 
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(viewState.categoryJokes, id: \.self) { joke in
-                       row(with: joke)
+            if let errorMessage = viewState.errorMessage {
+                Text(errorMessage)
+                    .appTextError()
+                    .padding(.top)
+            }
+
+            if viewState.isLoading {
+                loadingPlaceholder()
+            }
+            else {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(viewState.categoryJokes, id: \.self) { joke in
+                            row(with: joke)
+                        }
                     }
                 }
             }
 
             refreshButton
-                .padding(.vertical, 16)
+                .padding(.vertical)
         }
         .padding(.top, 8)
-        .padding(.horizontal, 16)
+        .padding(.horizontal)
         .navigationTitle(viewState.categoryName.capitalized)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -35,18 +48,17 @@ struct CategoryView: View {
 
 private extension CategoryView {
 
-    var refreshButton: some View {
-        HStack {
-            Spacer(minLength: 0)
-
-            Button("Refresh") {
-                print("refresh button pressed.")
+    func loadingPlaceholder() -> some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                row(with: placeHolderText)
+                row(with: placeHolderText)
+                row(with: placeHolderText)
             }
-            .buttonStyle(AppButtonStyle.Primary())
-
-            Spacer(minLength: 0)
+            .redacted(reason: .placeholder)
         }
     }
+
     func row(with joke: String) -> some View {
         HStack(spacing: 0) {
             Text(joke)
@@ -55,12 +67,43 @@ private extension CategoryView {
             Spacer(minLength: 0)
         }
     }
+
+    var refreshButton: some View {
+        HStack {
+            Spacer(minLength: 0)
+
+            Button("Refresh") {
+                viewState.on(event: .refreshButtonPressed)
+            }
+            .buttonStyle(AppButtonStyle.Primary())
+
+            Spacer(minLength: 0)
+        }
+    }
 }
 
 // MARK: - Previews
 
-#Preview("Light") {
+#Preview("loading") {
     CategoryView(viewState: CategoryViewState(categoryName: "Category 1"))
+        .preferredColorScheme(.light)
+}
+
+#Preview("ready") {
+    let viewState = CategoryViewState(categoryName: "Category 1")
+    return CategoryView(viewState: viewState)
+        .task {
+            await viewState.set(state: .ready(categoryJokes: ["Joke 1", "Joke 2"]))
+        }
+        .preferredColorScheme(.light)
+}
+
+#Preview("error") {
+    let viewState = CategoryViewState(categoryName: "Category 1")
+    return CategoryView(viewState: viewState)
+        .task {
+            await viewState.set(state: .error(message: "Error message..."))
+        }
         .preferredColorScheme(.light)
 }
 
