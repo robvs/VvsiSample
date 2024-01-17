@@ -14,7 +14,6 @@ class HomeViewInteractor: ViewInteractorBase<HomeViewState, HomeViewInteractor.N
     /// subscribed to and handled by a navigation coordinator.
     enum NavigationEvent {
         case category(name: String)
-        case dismiss
     }
 
     private let navigationEventSubject: PassthroughSubject<NavigationEvent, Never>
@@ -26,7 +25,7 @@ class HomeViewInteractor: ViewInteractorBase<HomeViewState, HomeViewInteractor.N
     private var categoriesTask: Task<(), Never>?
     private var cancellables: [AnyCancellable] = []
 
-    // MARK: Object life cycle
+    // MARK: Object lifecycle
 
     init(viewState: HomeViewState, session: AppUrlSessionHandling) {
         // initialize stored properties
@@ -52,7 +51,7 @@ class HomeViewInteractor: ViewInteractorBase<HomeViewState, HomeViewInteractor.N
 private extension HomeViewInteractor {
 
     func listenForEvents() {
-        // listen for view life cycle events.
+        // listen for view lifecycle events.
         viewState.viewLifeCycleEventPublisher
             .sink { [weak self] lifeCycleEvent in
                 switch lifeCycleEvent {

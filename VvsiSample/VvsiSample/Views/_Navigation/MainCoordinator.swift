@@ -57,10 +57,6 @@ private extension MainCoordinator {
 
                     Logger.view.debug("Append CategoryViewInteractor to nav path.")
                     self?.navigationState.path.append(Link.category(pathData: categoryViewInteractor))
-
-                case .dismiss:
-                    Logger.view.debug("Remove \(type(of: self?.navigationState.path)) from nav path.")
-                    self?.navigationState.path.removeLast()
                 }
             }
             .store(in: &cancellables)

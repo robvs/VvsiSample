@@ -17,28 +17,23 @@ class ViewStateBase<State, EventType>: ObservableObject {
 
     // MARK: Public properties
 
-    /// Publishes view life cycle events (i.e. viewDidLoad, viewWillAppear, etc.)
+    /// Publishes view lifecycle events (i.e. viewWillAppear, viewDidDisappear)
     let viewLifeCycleEventPublisher: AnyPublisher<ViewLifeCycleEvent, Never>
 
     /// Publishes view events - typically originating from a user action such as a button press.
     let eventPublisher: AnyPublisher<EventType, Never>
-
-    /// Publishes view state change events.
-    let stateChangePublisher: AnyPublisher<State, Never>
 
     /// The view's current state.
     private (set) var currentState: State
 
     // MARK: private properties
 
-    private (set) var didLoad = false
     private let updateAction: UpdateAction
     private var cancellables: [Combine.AnyCancellable] = []
 
     // event subjects that are used to send new events to the event publishers.
     private let viewLifeCycleEventSubject: PassthroughSubject<ViewLifeCycleEvent, Never>
     private let eventSubject: PassthroughSubject<EventType, Never>
-    private let stateChangeSubject: PassthroughSubject<State, Never>
 
     // MARK: Alert handling
 
@@ -61,18 +56,19 @@ class ViewStateBase<State, EventType>: ObservableObject {
     // MARK: View lifecycle
 
     init(with state: State, updateAction: @escaping UpdateAction) {
+        // configure event subjects and publishers.
         viewLifeCycleEventSubject = PassthroughSubject<ViewLifeCycleEvent, Never>()
         viewLifeCycleEventPublisher = viewLifeCycleEventSubject.eraseToAnyPublisher()
 
         eventSubject = PassthroughSubject<EventType, Never>()
         eventPublisher = eventSubject.eraseToAnyPublisher()
 
-        stateChangeSubject = PassthroughSubject<State, Never>()
-        stateChangePublisher = stateChangeSubject.eraseToAnyPublisher()
-
+        // set the initial state.
         currentState = state
         self.updateAction = updateAction
         updateAction(self, state)
+
+        listenForInputs()
     }
 
     /// Handle the given view lifecycle event and republish to listeners via `viewLifeCycleEventPublisher`.
@@ -101,8 +97,6 @@ class ViewStateBase<State, EventType>: ObservableObject {
     func set(state: State) async {
         updateAction(self, state)
         currentState = state
-
-        stateChangeSubject.send(currentState)
     }
 }
 
@@ -112,12 +106,13 @@ class ViewStateBase<State, EventType>: ObservableObject {
 private extension ViewStateBase {
 
     func listenForInputs() {
-        $shouldShowAlert.sink { [weak self] shouldShow in
-            // clear `alertType` after the user has dismissed the alert.
-            if !shouldShow {
-                self?.alertType = .none
+        $shouldShowAlert
+            .sink { [weak self] shouldShow in
+                // clear `alertType` after the user has dismissed the alert.
+                if !shouldShow {
+                    self?.alertType = .none
+                }
             }
-        }
-        .store(in: &cancellables)
+            .store(in: &cancellables)
     }
 }

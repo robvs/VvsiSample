@@ -15,7 +15,6 @@ class CategoryViewInteractor: ViewInteractorBase<CategoryViewState, CategoryView
     /// Navigation events that are emitted by this object. These are typically
     /// subscribed to and handled by a navigation coordinator.
     enum NavigationEvent {
-        case dismiss
     }
 
     private let navigationEventSubject: PassthroughSubject<NavigationEvent, Never>
@@ -26,7 +25,7 @@ class CategoryViewInteractor: ViewInteractorBase<CategoryViewState, CategoryView
     private var randomJokesTask: Task<(), Never>?
     private var cancellables: [AnyCancellable] = []
 
-    // MARK: Object life cycle
+    // MARK: Object lifecycle
 
     init(viewState: CategoryViewState, session: AppUrlSessionHandling) {
         // initialize stored properties
@@ -51,7 +50,7 @@ class CategoryViewInteractor: ViewInteractorBase<CategoryViewState, CategoryView
 private extension CategoryViewInteractor {
 
     func listenForEvents() {
-        // listen for view life cycle events.
+        // listen for view lifecycle events.
         viewState.viewLifeCycleEventPublisher
             .sink { [weak self] lifeCycleEvent in
                 switch lifeCycleEvent {

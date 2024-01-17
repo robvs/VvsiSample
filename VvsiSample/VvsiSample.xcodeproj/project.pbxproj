@@ -128,7 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				7FE3115D2B22A78800E097D7 /* _Components */,
-				7FE20FEF2B3F4AE90087FAA5 /* _Helpers */,
+				7FE20FEF2B3F4AE90087FAA5 /* _CoreElements */,
 				7FE3115A2B21702800E097D7 /* _Modifiers */,
 				7F5684D72B5477A000BAFDE9 /* _Navigation */,
 				7F87BFDD2B30D9FB000F6251 /* Category */,
@@ -227,13 +227,13 @@
 			path = VvsiSampleUITests;
 			sourceTree = "<group>";
 		};
-		7FE20FEF2B3F4AE90087FAA5 /* _Helpers */ = {
+		7FE20FEF2B3F4AE90087FAA5 /* _CoreElements */ = {
 			isa = PBXGroup;
 			children = (
 				7FE20FF02B3F4B020087FAA5 /* ViewStateBase.swift */,
 				7F5684E22B54D88800BAFDE9 /* ViewInteractorBase.swift */,
 			);
-			path = _Helpers;
+			path = _CoreElements;
 			sourceTree = "<group>";
 		};
 		7FE20FF62B40C0740087FAA5 /* Services */ = {
