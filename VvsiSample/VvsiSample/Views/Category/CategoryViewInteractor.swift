@@ -15,6 +15,8 @@ class CategoryViewInteractor: ViewInteractorBase<CategoryViewState, CategoryView
     /// Navigation events that are emitted by this object. These are typically
     /// subscribed to and handled by a navigation coordinator.
     enum NavigationEvent {
+        // the only navigation from this screen is the back button,
+        // which is handled by the `NavigationStack`.
     }
 
     private let navigationEventSubject: PassthroughSubject<NavigationEvent, Never>

@@ -1,8 +1,4 @@
-//
-//  VvsiSampleUITestsLaunchTests.swift
-//  VvsiSampleUITests
-//
-//  Created by Rob Vander Sloot on 12/4/23.
+//  Copyright © 2024 Rob Vander Sloot
 //
 
 import XCTest

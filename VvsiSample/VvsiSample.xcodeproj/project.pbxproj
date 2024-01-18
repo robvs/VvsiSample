@@ -21,7 +21,7 @@
 		7FB273062B1ECFF400AAC5DB /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB273052B1ECFF400AAC5DB /* HomeView.swift */; };
 		7FB273082B1ECFF500AAC5DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7FB273072B1ECFF500AAC5DB /* Assets.xcassets */; };
 		7FB2730C2B1ECFF500AAC5DB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7FB2730B2B1ECFF500AAC5DB /* Preview Assets.xcassets */; };
-		7FB273162B1ECFF500AAC5DB /* VvsiSampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB273152B1ECFF500AAC5DB /* VvsiSampleTests.swift */; };
+		7FB273162B1ECFF500AAC5DB /* HomeViewStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB273152B1ECFF500AAC5DB /* HomeViewStateTests.swift */; };
 		7FB273202B1ECFF500AAC5DB /* VvsiSampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB2731F2B1ECFF500AAC5DB /* VvsiSampleUITests.swift */; };
 		7FB273222B1ECFF500AAC5DB /* VvsiSampleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB273212B1ECFF500AAC5DB /* VvsiSampleUITestsLaunchTests.swift */; };
 		7FE20FF12B3F4B020087FAA5 /* ViewStateBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE20FF02B3F4B020087FAA5 /* ViewStateBase.swift */; };
@@ -72,7 +72,7 @@
 		7FB273092B1ECFF500AAC5DB /* VvsiSample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VvsiSample.entitlements; sourceTree = "<group>"; };
 		7FB2730B2B1ECFF500AAC5DB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		7FB273112B1ECFF500AAC5DB /* VvsiSampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VvsiSampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		7FB273152B1ECFF500AAC5DB /* VvsiSampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VvsiSampleTests.swift; sourceTree = "<group>"; };
+		7FB273152B1ECFF500AAC5DB /* HomeViewStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewStateTests.swift; sourceTree = "<group>"; };
 		7FB2731B2B1ECFF500AAC5DB /* VvsiSampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VvsiSampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FB2731F2B1ECFF500AAC5DB /* VvsiSampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VvsiSampleUITests.swift; sourceTree = "<group>"; };
 		7FB273212B1ECFF500AAC5DB /* VvsiSampleUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VvsiSampleUITestsLaunchTests.swift; sourceTree = "<group>"; };
@@ -213,7 +213,7 @@
 		7FB273142B1ECFF500AAC5DB /* VvsiSampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				7FB273152B1ECFF500AAC5DB /* VvsiSampleTests.swift */,
+				7FB273152B1ECFF500AAC5DB /* HomeViewStateTests.swift */,
 			);
 			path = VvsiSampleTests;
 			sourceTree = "<group>";
@@ -432,7 +432,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7FB273162B1ECFF500AAC5DB /* VvsiSampleTests.swift in Sources */,
+				7FB273162B1ECFF500AAC5DB /* HomeViewStateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
