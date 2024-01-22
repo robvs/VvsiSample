@@ -5,7 +5,7 @@ VVSI stands for View-ViewState-viewInteractor. It's a design pattern born out of
 
 This approach isn't intended to be the best solution for every app or every team. It is simply intended to reduce the complexity of large View Models while also providing better separation of concerns.
 
-## Over Engineering
+### Over Engineering
 Most sample apps used to illustrate a code concept or pattern are intentionally simplified in order to help highlight the concept or pattern. The downside is that these examples tend to lack many details and nuance that inevitably pops up in the real world, leaving the reader to discover and work through it themselves. This app takes the opposite approach. It is intentionally over-engineered in order to include complexities that are useful if not necessary when employing in a comercial setting.
 
 ## Background
