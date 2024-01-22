@@ -1,48 +1,54 @@
 # VvsiSample
-This is a sample application that illustrates use of the VVSI UI design pattern in SwiftUI.
+This is a sample application that illustrates use of the VVSI design pattern in SwiftUI.
 
-VVSI stands for View-ViewState-ViewInteractor. It's a design pattern born out of MVVM while borrowing a little from MVC and VIP. VVSI is intended to provide a consistent and clear approach towards organizing view-related code.
+VVSI stands for View-ViewState-viewInteractor. It's a design pattern born out of MVVM while borrowing a little from MVC and VIP. VVSI is intended to provide a consistent and clear approach towards organizing view-related code. It attempts to solve the problem of View Models that have become too large and overly complex, much like the UIKit issue of "Massive" View Controllers.
+
+This approach isn't intended to be the best solution for every app or every team. It is simply intended to reduce the complexity of large View Models while also providing better separation of concerns.
+
+## Over Engineering
+Most sample apps used to illustrate a code concept or pattern are intentionally simplified in order to help highlight the concept or pattern. The downside is that these examples tend to lack many details and nuance that inevitably pops up in the real world, leaving the reader to discover and work through it themselves. This app takes the opposite approach. It is intentionally over-engineered in order to include complexities that are useful if not necessary when employing in a comercial setting.
 
 ## Background
 
 ### MVC
-MVC (model-view-controller) is the natural design pattern for use in UIKit applications. In practice in iOS applications, you'd often end up with a View Controller that's bloated, difficult to maintain and difficult to test.
+MVC (Model-View-Controller) is the natural design pattern for use in UIKit applications. In practice in iOS applications, you'd often end up with a View Controller that's bloated, difficult to maintain and difficult to test, hense "Massive" View Controller.
 
 ### MVVM
-MVVM (model-view-view model) is a more natural design pattern for use in SwiftUI applications. Implementations typically include:
+MVVM (Model-View-ViewModel) fits naturally with SwiftUI. Implementations typically include:
 
 - A `View` that defines the layout and has a reference to a `ViewModel` object that drives the dynamic content.
-- A `ViewModel` that includes system dependencies along with the logic to transform model data into view data.
+- A `ViewModel` that includes system dependencies along with the logic to transform models into view data.
 
-This is an improvement over MVC, but View Models still tend to include too much business logic and have too many dependencies. This leads to overly complicated SwiftUI preview code and overly complicated unit tests.
+This is an improvement over MVC, but view models still tend to include too much business logic and have too many dependencies (i.e. repositories, web services, and other system resources). This leads to overly complicated SwiftUI preview code and overly complicated unit tests.
 
 ## VVSI
-VVSI (View-View State-View Interactor) attempts to address the primary issues with complex MVVM scenarios and provides guidelines for when the overhead of a View State or View Interactor is or isn't warranted.
+VVSI (View-ViewState-viewInteractor) attempts reduce the complexity of large View Models by splitting its responsibilities into two pieces - View State and View Interactor. The View State handles manipulation of model objects into presentation data, while the View Interactor manages interactions with the rest of the system such as repositories, web services, etc.).
 
 ### View
-A SwiftUI View provides the layout of a full screen or a subview.
+A SwiftUI View defines the layout of a full screen or a subview.
 
 Views should follow these guidelines:
 
 - Hard-code values that are never change. I'm not saying to pepper your view code with magic strings and numbers (those should still be stored in constants or wherever your app stores them). I'm saying that static values should not come from the View State object.
-- Use calculated properties and functions to encapsulate logical subviews and to keep the main layout code clean and readable.
-- Avoid business/domain logic. This includes avoiding simple logic that is based on model values. For example, if a subview is shown or hidden based on whether a particular model value is or isn't nil, then the View State should provide an "is shown" property to be used by the View. This make the View State object a closer proxy to the View and helps the View State unit tests to indicate intent.
+- Use calculated properties and functions to encapsulate subviews and to keep the main layout code clean and readable.
 
 ### View State
-A View State is tightly coupled to a view, usually via an `EnvironmentObject` or `ObservedObject`. It supplies values to the view that need to be determined at runtime.
+A View State is tightly coupled to a view, usually via an `EnvironmentObject` or `ObservedObject`. It provides dynamic values to the View (values that may change while the View is shown) and handles events generated by the view (i.e. user interactions like button presses).
+
+A View State should be all that is needed to render previews. And since the only dependencies are simple data objects/structs, there's no need for protocol mocks/fakes.
 
 View States should follow these guidelines:
 
-- Create a View State for full-screen views and for sub views that have enough complexity to warrant it. View State objects are generally not necessary for simple sub views such as buttons.
+- Dependencies should be restricted to model objects and data values. Avoid dependencies on system resources such as databases, web services, etc. that's what View Interactors are for.
 - Use @Published properties for all dynamic values (values that may change during the view's lifetime).
 - Use regular `let` properties for values that are determined at runtime but do not change during the view's lifecycle.
-- Dependencies should be restricted to simple data objects.
 - Avoid business/domain logic. Logic should be focussed on transforming model values into what's needed for the View.
-- Avoid dependencies on system resources such as databases, web services, etc. that's what View Interactors are for.
 
-The View and View State are tightly coupled and should be all that is needed to render previews. And since the only dependencies are simple data objects/structs, there's no need for protocol mocks/fakes.
+Unit tests of View States focus on validating screen element changes and, when done correctly, it avoids the complexities of the need for use cases objects or mocked system resources.
 
-Unit tests of View States focus on validating screen element changes and, when done correctly, avoid the complexities of use cases or mocked system resources
+Most screen-level views will warrant a View State object. Even if the screen contains no dynamic content, a View State can be handy for managing user interactions. Subviews should only have a View State if they contain enough complexity to warrant it.
+
+View Events (e.g. user interactions) that are fully contained within the view and do not require interaction with the rest of the system are handled by the View State (i.e. data model updates). If a View Event requires system interaction or leads to navigation, the Event should be bubbled up to the View Interactor.
 
 ### View Interactor
 A View Interactor handles interactions between the View/View State and the rest of the system.
@@ -52,3 +58,15 @@ View Interactors should follow these guidelines:
 - Create a View Interactor for views that require interaction with the rest of the system. If a view does not need to interact with the rest of the system (i.e. the view simply gathers info from the user), then a View Interactor should not be created for that view.
 - Dependencies include system resources such as databases and web services. However, I recommend wrapping most behavior inside of Use Case objects. This helps cut down on the number of dependencies inside the View Interactor and also results in cleaner code.
 - This is were business/domain logic required by a view is performed. But, in general, avoid transformation logic between a domain object and what's needed for the View - that is what the View State is for.
+
+- The VI determines **where** to navigate (next view, dismiss, etc.), the navigation coordinator determines **how** to navigate.
+
+View Interactors are generally used for all screen-level views that include interaction with the system or navigation. They are generally not used for subviews.
+
+View Interactors should almost never be created for subviews. Any needed system interactions should be handled by the parent screen-level view.
+
+A down side to this pattern is that programmatic navigation will probably be necessary, such as through the coordinator pattern. This is due to the fact that neither the View nor the View State have a reference to the View Interactor, and so View Interactors need to be referenced by another object that is tied to (or knows about) the associated View's lifecycle.
+
+## Coordinator Pattern & the Sample App
+
+A Coordinator pattern is used in the sample app in order to provide an example of how View Interactor are created an retained in an app. The app creates a single instance of `MainCoordinator`, which manages a `NavigationState` object that is used to provide the `NavigationPath` to a SwiftUI `NavigationStack`. View Interactors are a natural fit to be used as the data object in the `NavigationPath` because they must be retained while a View is on the navigation stack and should be released once the view is popped off of the stack.
