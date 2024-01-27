@@ -3,7 +3,7 @@
 
 import Foundation
 
-struct ChuckNorrisJoke: Codable {
+struct ChuckNorrisJoke: Codable, Equatable {
     let iconUrl: String?
     let id: String
     let url: String

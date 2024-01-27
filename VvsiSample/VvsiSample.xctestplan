@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "A082332C-0BA4-46B4-AC2D-989DA3E229D6",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:VvsiSample.xcodeproj",
+      "identifier" : "7FB272FF2B1ECFF400AAC5DB",
+      "name" : "VvsiSample"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:VvsiSample.xcodeproj",
+        "identifier" : "7FB273102B1ECFF500AAC5DB",
+        "name" : "VvsiSampleTests"
+      }
+    },
+    {
+      "enabled" : false,
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:VvsiSample.xcodeproj",
+        "identifier" : "7FB2731A2B1ECFF500AAC5DB",
+        "name" : "VvsiSampleUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

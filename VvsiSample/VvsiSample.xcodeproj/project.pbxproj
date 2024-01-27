@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7F308B4E2B1ED679009682EB /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F308B4D2B1ED679009682EB /* Image.swift */; };
+		7F50AD862B620B4E0000F564 /* XCTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F50AD852B620B4E0000F564 /* XCTest.swift */; };
 		7F5684D92B5477EE00BAFDE9 /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684D82B5477EE00BAFDE9 /* MainCoordinator.swift */; };
 		7F5684DB2B54813200BAFDE9 /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684DA2B54813200BAFDE9 /* NavigationState.swift */; };
 		7F5684DF2B5488DE00BAFDE9 /* CategoryViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5684DE2B5488DE00BAFDE9 /* CategoryViewState.swift */; };
@@ -24,6 +25,9 @@
 		7FB273162B1ECFF500AAC5DB /* HomeViewStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB273152B1ECFF500AAC5DB /* HomeViewStateTests.swift */; };
 		7FB273202B1ECFF500AAC5DB /* VvsiSampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB2731F2B1ECFF500AAC5DB /* VvsiSampleUITests.swift */; };
 		7FB273222B1ECFF500AAC5DB /* VvsiSampleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB273212B1ECFF500AAC5DB /* VvsiSampleUITestsLaunchTests.swift */; };
+		7FD447092B61F2DA00666FDC /* HomeViewInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD447082B61F2DA00666FDC /* HomeViewInteractorTests.swift */; };
+		7FD4470D2B61F3EB00666FDC /* FakeUrlSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD4470C2B61F3EB00666FDC /* FakeUrlSession.swift */; };
+		7FD4470F2B61F60600666FDC /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD4470E2B61F60600666FDC /* TimeInterval.swift */; };
 		7FE20FF12B3F4B020087FAA5 /* ViewStateBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE20FF02B3F4B020087FAA5 /* ViewStateBase.swift */; };
 		7FE20FF32B3F54A90087FAA5 /* AppAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE20FF22B3F54A90087FAA5 /* AppAlert.swift */; };
 		7FE20FF52B3F612D0087FAA5 /* HomeViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE20FF42B3F612D0087FAA5 /* HomeViewState.swift */; };
@@ -56,6 +60,7 @@
 
 /* Begin PBXFileReference section */
 		7F308B4D2B1ED679009682EB /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
+		7F50AD852B620B4E0000F564 /* XCTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCTest.swift; sourceTree = "<group>"; };
 		7F5684D82B5477EE00BAFDE9 /* MainCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCoordinator.swift; sourceTree = "<group>"; };
 		7F5684DA2B54813200BAFDE9 /* NavigationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationState.swift; sourceTree = "<group>"; };
 		7F5684DE2B5488DE00BAFDE9 /* CategoryViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewState.swift; sourceTree = "<group>"; };
@@ -76,6 +81,9 @@
 		7FB2731B2B1ECFF500AAC5DB /* VvsiSampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VvsiSampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FB2731F2B1ECFF500AAC5DB /* VvsiSampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VvsiSampleUITests.swift; sourceTree = "<group>"; };
 		7FB273212B1ECFF500AAC5DB /* VvsiSampleUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VvsiSampleUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		7FD447082B61F2DA00666FDC /* HomeViewInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewInteractorTests.swift; sourceTree = "<group>"; };
+		7FD4470C2B61F3EB00666FDC /* FakeUrlSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeUrlSession.swift; sourceTree = "<group>"; };
+		7FD4470E2B61F60600666FDC /* TimeInterval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInterval.swift; sourceTree = "<group>"; };
 		7FE20FF02B3F4B020087FAA5 /* ViewStateBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStateBase.swift; sourceTree = "<group>"; };
 		7FE20FF22B3F54A90087FAA5 /* AppAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAlert.swift; sourceTree = "<group>"; };
 		7FE20FF42B3F612D0087FAA5 /* HomeViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewState.swift; sourceTree = "<group>"; };
@@ -120,6 +128,7 @@
 				7FE311562B21676E00E097D7 /* Font.swift */,
 				7F308B4D2B1ED679009682EB /* Image.swift */,
 				7F65F99E2B4A68B1007E6F2C /* Logger.swift */,
+				7FD4470E2B61F60600666FDC /* TimeInterval.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -135,6 +144,23 @@
 				7F87BFDA2B2C00A5000F6251 /* Home */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		7F50AD832B620B1E0000F564 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				7F50AD842B620B320000F564 /* Extensions */,
+				7FD4470B2B61F3CF00666FDC /* Fakes */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		7F50AD842B620B320000F564 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				7F50AD852B620B4E0000F564 /* XCTest.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		7F5684D72B5477A000BAFDE9 /* _Navigation */ = {
@@ -213,7 +239,8 @@
 		7FB273142B1ECFF500AAC5DB /* VvsiSampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				7FB273152B1ECFF500AAC5DB /* HomeViewStateTests.swift */,
+				7F50AD832B620B1E0000F564 /* Helpers */,
+				7FD4470A2B61F3C300666FDC /* Views */,
 			);
 			path = VvsiSampleTests;
 			sourceTree = "<group>";
@@ -225,6 +252,23 @@
 				7FB273212B1ECFF500AAC5DB /* VvsiSampleUITestsLaunchTests.swift */,
 			);
 			path = VvsiSampleUITests;
+			sourceTree = "<group>";
+		};
+		7FD4470A2B61F3C300666FDC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				7FD447082B61F2DA00666FDC /* HomeViewInteractorTests.swift */,
+				7FB273152B1ECFF500AAC5DB /* HomeViewStateTests.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		7FD4470B2B61F3CF00666FDC /* Fakes */ = {
+			isa = PBXGroup;
+			children = (
+				7FD4470C2B61F3EB00666FDC /* FakeUrlSession.swift */,
+			);
+			path = Fakes;
 			sourceTree = "<group>";
 		};
 		7FE20FEF2B3F4AE90087FAA5 /* _CoreElements */ = {
@@ -403,6 +447,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F5684E32B54D88800BAFDE9 /* ViewInteractorBase.swift in Sources */,
+				7FD4470F2B61F60600666FDC /* TimeInterval.swift in Sources */,
 				7FE311642B22BDA800E097D7 /* AppButtonStyle.swift in Sources */,
 				7F5684DB2B54813200BAFDE9 /* NavigationState.swift in Sources */,
 				7FE311572B21676E00E097D7 /* Font.swift in Sources */,
@@ -432,7 +477,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FD447092B61F2DA00666FDC /* HomeViewInteractorTests.swift in Sources */,
 				7FB273162B1ECFF500AAC5DB /* HomeViewStateTests.swift in Sources */,
+				7F50AD862B620B4E0000F564 /* XCTest.swift in Sources */,
+				7FD4470D2B61F3EB00666FDC /* FakeUrlSession.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

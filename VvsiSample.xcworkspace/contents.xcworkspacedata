@@ -4,4 +4,7 @@
    <FileRef
       location = "group:VvsiSample/VvsiSample.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:VvsiSample/VvsiSample.xctestplan">
+   </FileRef>
 </Workspace>
