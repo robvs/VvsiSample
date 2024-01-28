@@ -113,8 +113,7 @@ private extension CategoryViewInteractor {
                 await viewState.set(state: .ready(categoryJokes: jokes))
             }
             catch let requestError as AppUrlSession.RequestError {
-                let errorMessage = "Retrieval of a random category joke failed (\(requestError.code))"
-                await viewState.set(state: .error(message: errorMessage))
+                await viewState.set(state: .error(message: requestError.localizedDescription))
             }
             catch _ as CancellationError {
                 // nothing to do here. cancellation is normal (i.e. because the view disappeared).

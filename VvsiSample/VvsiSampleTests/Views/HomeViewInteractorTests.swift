@@ -12,11 +12,6 @@ final class HomeViewInteractorTests: XCTestCase {
     private let jokeUrlString = "https://api.chucknorris.io/jokes/uKVtJZN4TMmT55lX3v752A"
     private let randomJoke = "Chuck Norris was once bitten by a rattlesnake, and after three days of suffering... the rattlesnake finally died!"
     private let categories = ["category01", "category02"]
-
-    // Combine subjects that are used to trigger a response in FakeUrlSession.get()
-    private let jokeSubject = PassthroughSubject<ChuckNorrisJoke?, Never>()
-    private let categoriesSubject = PassthroughSubject<[String]?, Never>()
-
     private var cancellables: [AnyCancellable] = []
 
     // MARK: Setup/Teardown
@@ -47,12 +42,12 @@ extension HomeViewInteractorTests {
         _ = await waitFor(urlCount: 2, on: urlSession)
 
         // Validate the view state after a random joke is received
-        jokeSubject.send(ChuckNorrisJoke(iconUrl: nil, id: "id01", url: jokeUrlString, value: randomJoke))
+        urlSession.triggerJokeResponse(with: ChuckNorrisJoke(iconUrl: nil, id: "id01", url: jokeUrlString, value: randomJoke))
         await expect(state: .loading(includesRandomJoke: false, includesCategories: true), on: sut)
         XCTAssertEqual(sut.viewState.randomJoke, randomJoke)
 
         // Validate the view state after categories are received
-        categoriesSubject.send(categories)
+        urlSession.triggerCategoriesResponse(with: categories)
         await expect(state: .ready, on: sut)
         XCTAssertEqual(sut.viewState.categories, categories)
     }
@@ -69,12 +64,12 @@ extension HomeViewInteractorTests {
         _ = await waitFor(urlCount: 2, on: urlSession)
 
         // Validate the view state after the random joke request fails
-        jokeSubject.send(nil)
+        urlSession.triggerJokeResponse(with: nil)
         await expect(state: .loading(includesRandomJoke: false, includesCategories: true), on: sut)
         XCTAssertNil(sut.viewState.randomJoke)
 
         // Validate the view state after the categories request fails are received
-        categoriesSubject.send(nil)
+        urlSession.triggerCategoriesResponse(with: nil)
         await expect(state: .ready, on: sut)
         XCTAssertNil(sut.viewState.categories)
     }
@@ -100,7 +95,7 @@ extension HomeViewInteractorTests {
         // Validate
         await expect(state: .loading(includesRandomJoke: true, includesCategories: false), on: sut)
 
-        jokeSubject.send(ChuckNorrisJoke(iconUrl: nil, id: "id01", url: jokeUrlString, value: expectedJoke))
+        urlSession.triggerJokeResponse(with: ChuckNorrisJoke(iconUrl: nil, id: "id01", url: jokeUrlString, value: expectedJoke))
         await expect(state: .ready, on: sut)
         XCTAssertEqual(sut.viewState.randomJoke, expectedJoke)
     }
@@ -108,7 +103,7 @@ extension HomeViewInteractorTests {
     func test_categorySelected() async throws {
         // Setup
         let selectedCategory = categories[0]
-        let (sut, urlSession) = await createSut(makeReady: true)
+        let (sut, _) = await createSut(makeReady: true)
 
         // listen for navigation events published by the sut
         let categoryNavigationEventTracker = CapturedObject<String>()
@@ -136,8 +131,7 @@ private extension HomeViewInteractorTests {
 
     func createSut(makeReady: Bool = false) async -> (HomeViewInteractor, FakeUrlSession) {
         let viewState = HomeViewState()
-        let urlSession = FakeUrlSession(jokePublisher: jokeSubject.eraseToAnyPublisher(),
-                                        categoriesPublisher: categoriesSubject.eraseToAnyPublisher())
+        let urlSession = FakeUrlSession()
         let sut = HomeViewInteractor(viewState: viewState, session: urlSession)
 
         if makeReady {
@@ -146,8 +140,8 @@ private extension HomeViewInteractorTests {
             _ = await waitFor(urlCount: 2, on: urlSession)
 
             // get to the `.ready` state
-            jokeSubject.send(ChuckNorrisJoke(iconUrl: nil, id: "id01", url: jokeUrlString, value: randomJoke))
-            categoriesSubject.send(categories)
+            urlSession.triggerJokeResponse(with: ChuckNorrisJoke(iconUrl: nil, id: "id01", url: jokeUrlString, value: randomJoke))
+            urlSession.triggerCategoriesResponse(with: categories)
             await expect(state: .ready, on: sut)
         }
 
