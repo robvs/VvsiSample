@@ -4,12 +4,14 @@
 @testable import VvsiSample
 import Combine
 import Foundation
+import OSLog
 
 class FakeUrlSession: AppUrlSessionHandling {
 
-    /// the error that is thrown by `get()` when a failure response is triggered
+    /// The error that is thrown by `get(from url:)` when a failure response is triggered
     static let requestError = AppUrlSession.RequestError.serverResponse(code: 404)
 
+    /// Keeps track of the URLs that are passed into `get(from url:)`
     private (set) var capturedUrls: [URL] = []
 
     private var jokeSubjects: [PassthroughSubject<ChuckNorrisJoke?, Never>] = []
@@ -25,52 +27,25 @@ extension FakeUrlSession {
     func get<Model>(from url: URL) async throws -> Model where Model : Decodable {
         return try await withCheckedThrowingContinuation { [weak self] (continuation: CheckedContinuation<Model, Error>) in
             guard let self = self else {
-                print("FakeUrlSession went out of scope")
+                Logger.api.warning("FakeUrlSession went out of scope")
                 return
             }
 
-            print("url.path(): \(url.path())")
-            if url.path() == ChuckNorrisIoRequest.getRandomJoke(category: nil).url.path() {
-                print("random joke url: \(url.absoluteString)")
-
+            // setup a publisher on the subject that's associated with `Model` and
+            // resume the continuation when a value is received on that publisher.
+            switch continuation {
+            case let jokeContinuation as CheckedContinuation<ChuckNorrisJoke, Error>:
                 let subject = PassthroughSubject<ChuckNorrisJoke?, Never>()
-                let publisher = subject.eraseToAnyPublisher()
                 jokeSubjects.append(subject)
+                resume(continuation: jokeContinuation, on: subject.eraseToAnyPublisher())
 
-                publisher
-                    .first()  // take only the first one because the next call to this function with start another subscriber.
-                    .sink { joke in
-                        print("received joke: \(String(describing: joke))")
-                        if let joke = joke as? Model {
-                            continuation.resume(returning: joke)
-                        }
-                        else {
-                            continuation.resume(throwing: Self.requestError)
-                        }
-                    }
-                    .store(in: &cancellables)
-            }
-            else if url.path() == ChuckNorrisIoRequest.getCategories.url.path() {
-                print("categories url: \(url.absoluteString)")
-
+            case let categoriesContinuation as CheckedContinuation<[String], Error>:
                 let subject = PassthroughSubject<[String]?, Never>()
-                let publisher = subject.eraseToAnyPublisher()
                 categoriesSubjects.append(subject)
+                resume(continuation: categoriesContinuation, on: subject.eraseToAnyPublisher())
 
-                publisher
-                    .first()  // take only the first one because the next call to this function with start another subscriber.
-                    .sink { categories in
-                        print("received categories: \(String(describing: categories))")
-                        if let categories = categories as? Model  {
-                            continuation.resume(returning: categories)
-                        }
-                        else {
-                            continuation.resume(throwing: Self.requestError)
-                        }
-                    }
-                    .store(in: &cancellables)
-            }
-            else {
+            default:
+                Logger.api.error("Unexpected URL session request model type: \(Model.self)")
                 continuation.resume(throwing: AppUrlSession.RequestError.unexpected("Unexpected url: \(url.absoluteString)"))
             }
 
@@ -95,7 +70,7 @@ extension FakeUrlSession {
     ///  - joke: The joke returned from the `get()` request. If `nil`, an error response is thrown.
     func triggerJokeResponse(with joke: ChuckNorrisJoke?) {
         guard jokeSubjects.count > 0 else {
-            print("ERROR: Joke response can not be triggered because there are no pending requests.")
+            Logger.api.error("Joke response can not be triggered because there are no pending requests.")
             return
         }
 
@@ -111,11 +86,33 @@ extension FakeUrlSession {
     ///  - categories: The categories returned from the `get()` request. If `nil`, an error response is thrown.
     func triggerCategoriesResponse(with categories: [String]?) {
         guard categoriesSubjects.count > 0 else {
-            print("ERROR: Categories response can not be triggered because there are no pending requests.")
+            Logger.api.error("Categories response can not be triggered because there are no pending requests.")
             return
         }
 
         categoriesSubjects[0].send(categories)
         categoriesSubjects.removeFirst()
+    }
+}
+
+
+// MARK: - Private Helpers
+
+private extension FakeUrlSession {
+
+    func resume<Model>(continuation: CheckedContinuation<Model, Error>,
+                   on publisher: AnyPublisher<Model?, Never>) {
+        publisher
+            .first() // note that we never want to receive more than one item from this publisher
+            .sink { response in
+                Logger.api.debug("received response: \(String(describing: response))")
+                if let response = response {
+                    continuation.resume(returning: response)
+                }
+                else {
+                    continuation.resume(throwing: Self.requestError)
+                }
+            }
+            .store(in: &cancellables)
     }
 }

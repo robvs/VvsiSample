@@ -64,6 +64,22 @@ extension CategoryViewInteractorTests {
         // Validate initial view state after loading has completed
         await expect(state: .error(message: FakeUrlSession.requestError.localizedDescription), on: sut)
     }
+
+    func test_initialState_duplicateJokes() async throws {
+        // Setup/Execute
+        let duplicates = ["Joke 1", "Joke 1", "Joke 2", "Joke 2", "Joke 2"]
+        let (sut, urlSession) = await createSut()
+
+        // Validate the initial view state
+        XCTAssertEqual(sut.viewState.currentState, .loading)
+
+        // wait for the interactor to make the full set of joke requests
+        // on the session with the specified set of responses.
+        await trigger(jokeResponses: duplicates, on: urlSession)
+
+        // Validate initial view state after loading has completed
+        await expect(state: .ready(categoryJokes: ["Joke 1", "Joke 2"]), on: sut)
+    }
 }
 
 
