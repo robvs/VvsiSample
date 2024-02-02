@@ -126,14 +126,16 @@ private extension HomeView {
         }
     }
 
-    func error(message: String?) -> (some View)? {
-        guard let message = message else {
-            return AnyView(EmptyView())
+    @ViewBuilder
+    func error(message: String?) -> some View {
+        if let message = message {
+            Text(message)
+                .foregroundStyle(.appTextError)
+                .appBodyTextSmall()
         }
-
-        return AnyView(Text(message)
-            .foregroundStyle(.appTextError)
-            .appBodyTextSmall())
+        else {
+            EmptyView()
+        }
     }
 }
 
@@ -142,6 +144,7 @@ private extension HomeView {
 
 #Preview("Initial State") {
     return HomeView(viewState: HomeViewState())
+        .environmentObject(NavigationState())
         .preferredColorScheme(.light)
 }
 
@@ -151,6 +154,7 @@ private extension HomeView {
         .task {
             await viewState.update(randomJoke: randomJoke)
         }
+        .environmentObject(NavigationState())
         .preferredColorScheme(.light)
 }
 
@@ -160,6 +164,7 @@ private extension HomeView {
         .task {
             await viewState.update(categories: categoryNames)
         }
+        .environmentObject(NavigationState())
         .preferredColorScheme(.light)
 }
 
@@ -170,6 +175,7 @@ private extension HomeView {
             await viewState.update(randomJoke: randomJoke)
             await viewState.update(categories: categoryNames)
         }
+        .environmentObject(NavigationState())
         .preferredColorScheme(.light)
 }
 
@@ -180,11 +186,13 @@ private extension HomeView {
             await viewState.update(randomJoke: nil, errorMessage: "There was a random joke error.")
             await viewState.update(categories: nil, errorMessage: "There was a category error.")
         }
+        .environmentObject(NavigationState())
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
     return HomeView(viewState: HomeViewState())
+        .environmentObject(NavigationState())
         .preferredColorScheme(.dark)
 }
 
@@ -195,6 +203,7 @@ private extension HomeView {
             await viewState.update(randomJoke: nil, errorMessage: "There was a random joke error.")
             await viewState.update(categories: nil, errorMessage: "There was a category error.")
         }
+        .environmentObject(NavigationState())
         .preferredColorScheme(.dark)
 }
 
