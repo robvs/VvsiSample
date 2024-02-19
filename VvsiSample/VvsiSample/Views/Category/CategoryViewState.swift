@@ -4,8 +4,8 @@
 import OSLog
 import SwiftUI
 
-typealias CategoryViewStateBase = ViewStateBase<CategoryViewState.State,
-                                                CategoryViewState.Event>
+typealias CategoryViewStateBase = ViewState<CategoryViewState.State,
+                                            CategoryViewState.Event>
 
 /// Manage view state for the Category screen.
 class CategoryViewState: CategoryViewStateBase {

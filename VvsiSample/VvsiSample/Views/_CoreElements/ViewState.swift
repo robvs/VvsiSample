@@ -4,36 +4,34 @@
 import Combine
 
 /// Events that can be emitted by a view state relating to the view's lifecycle.
-enum ViewLifeCycleEvent {
+enum ViewLifecycleEvent {
     case viewWillAppear
     case viewDidDisappear
 }
 
-/// Base class for view state objects. Provides functionality that is common to all view states.
-class ViewStateBase<State, EventType>: ObservableObject {
+/// Base class for view state objects, which are objects that drive the dynamic
+/// elements of a view.
+///
+/// `State` is defined by a subclass to represent specific states.
+/// `Event` is defined by a subclass to represent event that can be emitted by the view.
+///
+/// The view emits input event like this:
+/// `.onAppear { viewState.on(viewLifecycleEvent: .viewWillAppear) }`
+class ViewState<State, Event>: ObservableObject {
 
-    // type-aliases helper
-    typealias UpdateAction = (ViewStateBase<State, EventType>, State) -> Void
+    // type-alias helper
+    typealias UpdateAction = (ViewState<State, Event>, State) -> Void
 
     // MARK: Public properties
 
     /// Publishes view lifecycle events (i.e. viewWillAppear, viewDidDisappear)
-    let viewLifeCycleEventPublisher: AnyPublisher<ViewLifeCycleEvent, Never>
+    let viewLifecycleEventPublisher: AnyPublisher<ViewLifecycleEvent, Never>
 
     /// Publishes view events - typically originating from a user action such as a button press.
-    let eventPublisher: AnyPublisher<EventType, Never>
+    let eventPublisher: AnyPublisher<Event, Never>
 
     /// The view's current state.
     private (set) var currentState: State
-
-    // MARK: private properties
-
-    private let updateAction: UpdateAction
-    private var cancellables: [Combine.AnyCancellable] = []
-
-    // event subjects that are used to send new events to the event publishers.
-    private let viewLifeCycleEventSubject: PassthroughSubject<ViewLifeCycleEvent, Never>
-    private let eventSubject: PassthroughSubject<EventType, Never>
 
     // MARK: Alert handling
 
@@ -53,14 +51,23 @@ class ViewStateBase<State, EventType>: ObservableObject {
         }
     }
 
+    // MARK: private properties
+
+    private let updateAction: UpdateAction
+    private var cancellables: [Combine.AnyCancellable] = []
+
+    // event subjects that are used to send new events to the event publishers.
+    private let viewLifecycleEventSubject: PassthroughSubject<ViewLifecycleEvent, Never>
+    private let eventSubject: PassthroughSubject<Event, Never>
+
     // MARK: View lifecycle
 
     init(with state: State, updateAction: @escaping UpdateAction) {
         // configure event subjects and publishers.
-        viewLifeCycleEventSubject = PassthroughSubject<ViewLifeCycleEvent, Never>()
-        viewLifeCycleEventPublisher = viewLifeCycleEventSubject.eraseToAnyPublisher()
+        viewLifecycleEventSubject = PassthroughSubject<ViewLifecycleEvent, Never>()
+        viewLifecycleEventPublisher = viewLifecycleEventSubject.eraseToAnyPublisher()
 
-        eventSubject = PassthroughSubject<EventType, Never>()
+        eventSubject = PassthroughSubject<Event, Never>()
         eventPublisher = eventSubject.eraseToAnyPublisher()
 
         // set the initial state.
@@ -71,22 +78,22 @@ class ViewStateBase<State, EventType>: ObservableObject {
         listenForInputs()
     }
 
-    /// Handle the given view lifecycle event and republish to listeners via `viewLifeCycleEventPublisher`.
+    /// Handle the given view lifecycle event and republish to listeners via `viewLifecycleEventPublisher`.
     ///
     /// This is expected to be called by the view when a lifecycle event happens. For example:
     /// `.task { viewState.on(viewLifecycleEvent: .viewWillAppear) }`
     /// `.onDisappear { viewModel.viewLifecycleInput.event.onNext(.viewWillDisappear) }`
     ///
     /// This can be overridden for custom handling.
-    func on(viewLifecycleEvent: ViewLifeCycleEvent) {
-        viewLifeCycleEventSubject.send(viewLifecycleEvent)
+    func on(viewLifecycleEvent: ViewLifecycleEvent) {
+        viewLifecycleEventSubject.send(viewLifecycleEvent)
     }
 
     /// Handle the given view event and republish to listeners via `eventPublisher`.
     ///
     /// This is expected to be called by the view when an event such as a button press happens.
     /// This can be overridden for custom handling.
-    func on(event: EventType) {
+    func on(event: Event) {
         eventSubject.send(event)
     }
 
@@ -103,7 +110,7 @@ class ViewStateBase<State, EventType>: ObservableObject {
 
 // MARK: - Private Helpers
 
-private extension ViewStateBase {
+private extension ViewState {
 
     func listenForInputs() {
         $shouldShowAlert

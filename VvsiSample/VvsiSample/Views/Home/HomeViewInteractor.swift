@@ -5,8 +5,8 @@ import Combine
 import OSLog
 
 /// Handle interactions between the Home screen (e.g. `HomeViewState`) and the backend.
-class HomeViewInteractor: ViewInteractorBase<HomeViewState, HomeViewInteractor.NavigationEvent>,
-                          ObservableObject {
+class HomeViewInteractor: ViewInteractor<HomeViewState,
+                                         HomeViewInteractor.NavigationEvent> {
 
     // MARK: Navigation Events
 
@@ -52,7 +52,7 @@ private extension HomeViewInteractor {
 
     func listenForEvents() {
         // listen for view lifecycle events.
-        viewState.viewLifeCycleEventPublisher
+        viewState.viewLifecycleEventPublisher
             .sink { [weak self] lifeCycleEvent in
                 switch lifeCycleEvent {
                 case .viewWillAppear:

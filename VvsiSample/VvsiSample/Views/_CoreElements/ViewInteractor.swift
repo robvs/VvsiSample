@@ -6,7 +6,7 @@ import OSLog
 
 /// Base class for view interactors, which handle interactions between a view and the
 /// rest of the system.
-class ViewInteractorBase<ViewState, NavigationEvent>: NavigationPathable {
+class ViewInteractor<ViewState, NavigationEvent>: NavigationPathable {
 
     /// Manages the dynamic elements of a view as well as user interactions.
     let viewState: ViewState

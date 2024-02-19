@@ -5,8 +5,8 @@ import Combine
 import OSLog
 
 /// Handle interactions between the Category screen (e.g. `CategoryViewState`) and the backend.
-class CategoryViewInteractor: ViewInteractorBase<CategoryViewState, CategoryViewInteractor.NavigationEvent>,
-                              ObservableObject {
+class CategoryViewInteractor: ViewInteractor<CategoryViewState, 
+                                             CategoryViewInteractor.NavigationEvent> {
 
     static let jokeCount = 5
 
@@ -53,7 +53,7 @@ private extension CategoryViewInteractor {
 
     func listenForEvents() {
         // listen for view lifecycle events.
-        viewState.viewLifeCycleEventPublisher
+        viewState.viewLifecycleEventPublisher
             .sink { [weak self] lifeCycleEvent in
                 switch lifeCycleEvent {
                 case .viewWillAppear:
