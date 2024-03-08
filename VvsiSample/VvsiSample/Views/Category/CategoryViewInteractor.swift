@@ -5,7 +5,7 @@ import Combine
 import OSLog
 
 /// Handle interactions between the Category screen (e.g. `CategoryViewState`) and the backend.
-class CategoryViewInteractor: ViewInteractor<CategoryViewState, 
+class CategoryViewInteractor: ViewInteractor<CategoryViewAgent,
                                              CategoryViewInteractor.NavigationEvent> {
 
     static let jokeCount = 5
@@ -29,20 +29,20 @@ class CategoryViewInteractor: ViewInteractor<CategoryViewState,
 
     // MARK: Object lifecycle
 
-    init(viewState: CategoryViewState, session: AppUrlSessionHandling) {
+    init(viewAgent: CategoryViewAgent, session: AppUrlSessionHandling) {
         // initialize stored properties
         self.session = session
         navigationEventSubject = PassthroughSubject<NavigationEvent, Never>()
 
         // initialize base class
-        super.init(viewState: viewState,
+        super.init(viewState: viewAgent,
                    navigationEventPublisher: navigationEventSubject.eraseToAnyPublisher())
 
         // listen for events from the view state.
         listenForEvents()
 
         // initiate the api calls.
-        startFetchOfRandomJokes(for: viewState.categoryName)
+        startFetchOfRandomJokes(for: viewAgent.state.categoryName)
     }
 }
 
@@ -68,10 +68,10 @@ private extension CategoryViewInteractor {
             .store(in: &cancellables)
 
         // listen for user input events.
-        viewState.eventPublisher
-            .sink { event in
+        viewState.actionPublisher
+            .sink { action in
                 Task { @MainActor [weak self] in
-                    await self?.handle(event: event)
+                    self?.handle(action: action)
                 }
             }
             .store(in: &cancellables)
@@ -79,11 +79,11 @@ private extension CategoryViewInteractor {
 
     /// Handle the given user input event.
     @MainActor
-    func handle(event: CategoryViewState.Event) async {
-        switch event {
+    func handle(action: CategoryViewAgent.Action) {
+        switch action {
         case .refreshButtonPressed:
-            await viewState.set(state: .loading)
-            startFetchOfRandomJokes(for: viewState.categoryName)
+            viewState.reduce(with: .loading)
+            startFetchOfRandomJokes(for: viewState.state.categoryName)
         }
     }
 }
@@ -95,10 +95,11 @@ private extension CategoryViewInteractor {
 
     func startFetchOfRandomJokes(for category: String) {
         randomJokesTask = Task { @MainActor in
-            var jokes: [String] = []
+            let result: GetRandomJokesResult
 
             do {
                 // fetch a set of random category jokes
+                var jokes: [String] = []
                 for _ in 0..<Self.jokeCount {
                     let jokeUrl = ChuckNorrisIoRequest.getRandomJoke(category: category).url
                     let joke: ChuckNorrisJoke = try await session.get(from: jokeUrl)
@@ -109,19 +110,21 @@ private extension CategoryViewInteractor {
                     }
                 }
 
-                Logger.view.trace("Update Category view with: \(jokes)")
-                await viewState.set(state: .ready(categoryJokes: jokes))
+                result = GetRandomJokesResult.success(jokes)
             }
             catch let requestError as AppUrlSession.RequestError {
-                await viewState.set(state: .error(message: requestError.localizedDescription))
+                result = GetRandomJokesResult.failure(requestError)
             }
             catch _ as CancellationError {
                 // nothing to do here. cancellation is normal (i.e. because the view disappeared).
+                return
             }
             catch {
-                let errorMessage = "An unexpected error occurred: (\(error.localizedDescription))"
-                await viewState.set(state: .error(message: errorMessage))
+                result = GetRandomJokesResult.failure(AppUrlSession.RequestError.unexpected(error.localizedDescription))
             }
+
+            Logger.view.trace("Fetch result: \(String(describing: result))")
+            viewState.reduce(with: .getRandomJokesResult(result))
         }
     }
 

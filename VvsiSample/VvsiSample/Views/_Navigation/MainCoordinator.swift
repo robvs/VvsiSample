@@ -16,7 +16,7 @@ class MainCoordinator {
     /// stack, thus freeing its memory.
     enum Link {
         /// Category screen
-        case category(pathData: any NavigationPathable<CategoryViewState>)
+        case category(pathData: any NavigationPathable<CategoryViewAgent>)
     }
 
     /// This is injected as an environment object on the home screen to
@@ -52,7 +52,8 @@ private extension MainCoordinator {
                 switch event {
                 case .category(name: let name):
                     let categoryViewState = CategoryViewState(categoryName: name)
-                    let categoryViewInteractor = CategoryViewInteractor(viewState: categoryViewState,
+                    let categoryViewAgent = CategoryViewAgent(state: categoryViewState)
+                    let categoryViewInteractor = CategoryViewInteractor(viewAgent: categoryViewAgent,
                                                                         session: AppUrlSession.shared)
 
                     Logger.view.debug("Append CategoryViewInteractor to nav path.")
@@ -70,7 +71,7 @@ private extension MainCoordinator {
 extension MainCoordinator.Link: Hashable {
 
     /// Convenience property that provides the ViewInteractor that is associated with a given Link.
-    var pathData: any NavigationPathable<CategoryViewState> {
+    var pathData: any NavigationPathable<CategoryViewAgent> {
         switch self {
         case .category(let pathData):
             return pathData

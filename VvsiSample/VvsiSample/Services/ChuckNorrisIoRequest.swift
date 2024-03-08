@@ -3,13 +3,23 @@
 
 import Foundation
 
+// MARK: Request result types
+
+typealias GetRandomJokeResult = Result<String, AppUrlSession.RequestError>
+typealias GetRandomJokesResult = Result<[String], AppUrlSession.RequestError>
+typealias GetCategoriesResult = Result<[String], AppUrlSession.RequestError>
+
 /// Defines request data for web service calls to `chucknorris.io`.
 enum ChuckNorrisIoRequest {
+
+    // MARK: Static properties
 
     /// Base url for the `chucknorris.io` web service.
     ///
     /// Note: The force unwrap is "safe" to do here because we can be certain that the URL string will parse.
     static let baseUrl = URL(string: "https://api.chucknorris.io")!
+
+    // MARK: Available API requests
 
     /// Get a random joke for the given category. If `category` is `nil`, get any random joke.
     ///
@@ -29,6 +39,8 @@ enum ChuckNorrisIoRequest {
     /// Sample response:
     /// `["animal","career","celebrity"]`
     case getCategories
+
+    // MARK: Public helpers
 
     /// The full path URL for the request.
     var url: URL {

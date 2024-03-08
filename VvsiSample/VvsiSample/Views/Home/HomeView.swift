@@ -24,7 +24,7 @@ struct HomeView: View {
             .navigationDestination(for: MainCoordinator.Link.self) { link in
                 switch link {
                 case .category(let pathData):
-                    CategoryView(viewState: pathData.viewState)
+                    CategoryView(viewAgent: pathData.viewState)
                 }
             }
         }

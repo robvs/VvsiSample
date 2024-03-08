@@ -5,7 +5,8 @@ import SwiftUI
 
 /// Displays a set of random jokes for a specific category.
 struct CategoryView: View {
-    @ObservedObject var viewState: CategoryViewState
+    @ObservedObject var viewAgent: CategoryViewAgent
+    private var viewState: CategoryViewState { viewAgent.state }
 
     private let placeHolderText = "If Chuck Norris goes to Z'ha'dum, he would not die."
 
@@ -26,7 +27,7 @@ struct CategoryView: View {
             else {
                 ScrollView {
                     VStack(spacing: 16) {
-                        ForEach(viewState.categoryJokes, id: \.self) { joke in
+                        ForEach(viewState.jokes, id: \.self) { joke in
                             row(with: joke)
                         }
                     }
@@ -73,9 +74,10 @@ private extension CategoryView {
             Spacer(minLength: 0)
 
             Button("Refresh") {
-                viewState.on(event: .refreshButtonPressed)
+                viewAgent.send(action: .refreshButtonPressed)
             }
             .buttonStyle(AppButtonStyle.Primary())
+            .disabled(viewAgent.state.refreshButtonDisabled)
 
             Spacer(minLength: 0)
         }
@@ -85,29 +87,35 @@ private extension CategoryView {
 // MARK: - Previews
 
 #Preview("loading") {
-    CategoryView(viewState: CategoryViewState(categoryName: "Category 1"))
+    let viewState = CategoryViewState(categoryName: "Category 1")
+    return CategoryView(viewAgent: CategoryViewAgent(state: viewState))
         .preferredColorScheme(.light)
 }
 
 #Preview("ready") {
     let viewState = CategoryViewState(categoryName: "Category 1")
-    return CategoryView(viewState: viewState)
+    let viewAgent = CategoryViewAgent(state: viewState)
+    return CategoryView(viewAgent: viewAgent)
         .task {
-            await viewState.set(state: .ready(categoryJokes: ["Joke 1", "Joke 2"]))
+            let result = GetRandomJokesResult.success(["Joke 1", "Joke 2"])
+            viewAgent.reduce(with: .getRandomJokesResult(result))
         }
         .preferredColorScheme(.light)
 }
 
 #Preview("error") {
     let viewState = CategoryViewState(categoryName: "Category 1")
-    return CategoryView(viewState: viewState)
+    let viewAgent = CategoryViewAgent(state: viewState)
+    return CategoryView(viewAgent: viewAgent)
         .task {
-            await viewState.set(state: .error(message: "Error message..."))
+            let result = GetRandomJokesResult.failure(AppUrlSession.RequestError.serverResponse(code: 404))
+            viewAgent.reduce(with: .getRandomJokesResult(result))
         }
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
-    CategoryView(viewState: CategoryViewState(categoryName: "Category 1"))
+    let viewState = CategoryViewState(categoryName: "Category 1")
+    return CategoryView(viewAgent: CategoryViewAgent(state: viewState))
         .preferredColorScheme(.dark)
 }
