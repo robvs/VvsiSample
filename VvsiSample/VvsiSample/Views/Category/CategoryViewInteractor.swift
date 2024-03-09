@@ -5,7 +5,7 @@ import Combine
 import OSLog
 
 /// Handle interactions between the Category screen (e.g. `CategoryViewState`) and the backend.
-class CategoryViewInteractor: ViewInteractor<CategoryViewAgent,
+class CategoryViewInteractor: ViewInteractor<CategoryViewState,
                                              CategoryViewInteractor.NavigationEvent> {
 
     static let jokeCount = 5
@@ -29,20 +29,20 @@ class CategoryViewInteractor: ViewInteractor<CategoryViewAgent,
 
     // MARK: Object lifecycle
 
-    init(viewAgent: CategoryViewAgent, session: AppUrlSessionHandling) {
+    init(viewState: CategoryViewState, session: AppUrlSessionHandling) {
         // initialize stored properties
         self.session = session
         navigationEventSubject = PassthroughSubject<NavigationEvent, Never>()
 
         // initialize base class
-        super.init(viewState: viewAgent,
+        super.init(viewState: viewState,
                    navigationEventPublisher: navigationEventSubject.eraseToAnyPublisher())
 
         // listen for events from the view state.
         listenForEvents()
 
         // initiate the api calls.
-        startFetchOfRandomJokes(for: viewAgent.state.categoryName)
+        startFetchOfRandomJokes(for: viewState.state.categoryName)
     }
 }
 

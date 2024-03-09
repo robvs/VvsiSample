@@ -9,6 +9,9 @@ struct HomeView: View {
     @EnvironmentObject var navigationState: NavigationState
     @ObservedObject var viewState: HomeViewState
 
+    /// Convenience property to give direct access to `viewState.state`.
+    private var state: HomeViewState.State { viewState.state }
+
     var body: some View {
         NavigationStack(path: $navigationState.path) {
             VStack(alignment: .leading, spacing: 16) {
@@ -24,7 +27,7 @@ struct HomeView: View {
             .navigationDestination(for: MainCoordinator.Link.self) { link in
                 switch link {
                 case .category(let pathData):
-                    CategoryView(viewAgent: pathData.viewState)
+                    CategoryView(viewState: pathData.viewState)
                 }
             }
         }
@@ -71,17 +74,17 @@ private extension HomeView {
                 Spacer()
 
                 Image(systemName: "arrow.clockwise")
-                    .foregroundStyle(viewState.refreshButtonDisabled ? .appOnSurfaceDisabled : .appTextLink)
-                    .disabled(viewState.refreshButtonDisabled)
+                    .foregroundStyle(state.refreshButtonDisabled ? .appOnSurfaceDisabled : .appTextLink)
+                    .disabled(state.refreshButtonDisabled)
                     .onTapGesture {
-                        viewState.on(event: .refreshButtonPressed)
+                        viewState.send(action: .refreshButtonPressed)
                     }
             }
 
-            error(message: viewState.randomJokeError)
+            error(message: state.randomJokeError)
 
             Group {
-                if let randomJoke = viewState.randomJoke {
+                if let randomJoke = state.randomJoke {
                     Text(randomJoke)
                         .appBodyText()
                         .italic()
@@ -100,15 +103,15 @@ private extension HomeView {
             Text("Categories")
                 .appTitle2()
 
-            error(message: viewState.categoriesError)
+            error(message: state.categoriesError)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    if let categoryNames = viewState.categories {
+                    if let categoryNames = state.categories {
                         ForEach(categoryNames, id: \.self) { categoryName in
                             HomeCategoryListRow(categoryName: categoryName)
                                 .onTapGesture {
-                                    viewState.on(event: .categorySelected(name: categoryName))
+                                    viewState.send(action: .categorySelected(name: categoryName))
                                 }
                         }
                     }
@@ -152,7 +155,8 @@ private extension HomeView {
     let viewState = HomeViewState()
     return HomeView(viewState: viewState)
         .task {
-            await viewState.update(randomJoke: randomJoke)
+            let result = GetRandomJokeResult.success(randomJoke)
+            viewState.reduce(with: .getRandomJokeResult(result))
         }
         .environmentObject(NavigationState())
         .preferredColorScheme(.light)
@@ -162,7 +166,8 @@ private extension HomeView {
     let viewState = HomeViewState()
     return HomeView(viewState: viewState)
         .task {
-            await viewState.update(categories: categoryNames)
+            let result = GetCategoriesResult.success(categoryNames)
+            viewState.reduce(with: .getCategoriesResult(result))
         }
         .environmentObject(NavigationState())
         .preferredColorScheme(.light)
@@ -172,8 +177,10 @@ private extension HomeView {
     let viewState = HomeViewState()
     return HomeView(viewState: viewState)
         .task {
-            await viewState.update(randomJoke: randomJoke)
-            await viewState.update(categories: categoryNames)
+            let jokeResult = GetRandomJokeResult.success(randomJoke)
+            let categoriesResult = GetCategoriesResult.success(categoryNames)
+            viewState.reduce(with: .getRandomJokeResult(jokeResult))
+            viewState.reduce(with: .getCategoriesResult(categoriesResult))
         }
         .environmentObject(NavigationState())
         .preferredColorScheme(.light)
@@ -183,8 +190,12 @@ private extension HomeView {
     let viewState = HomeViewState()
     return HomeView(viewState: viewState)
         .task {
-            await viewState.update(randomJoke: nil, errorMessage: "There was a random joke error.")
-            await viewState.update(categories: nil, errorMessage: "There was a category error.")
+            let jokeError = AppUrlSession.RequestError.serverResponse(code: 404)
+            let categoriesError = AppUrlSession.RequestError.serverResponse(code: 404)
+            let jokeResult = GetRandomJokeResult.failure(jokeError)
+            let categoriesResult = GetCategoriesResult.failure(categoriesError)
+            viewState.reduce(with: .getRandomJokeResult(jokeResult))
+            viewState.reduce(with: .getCategoriesResult(categoriesResult))
         }
         .environmentObject(NavigationState())
         .preferredColorScheme(.light)
@@ -200,8 +211,12 @@ private extension HomeView {
     let viewState = HomeViewState()
     return HomeView(viewState: viewState)
         .task {
-            await viewState.update(randomJoke: nil, errorMessage: "There was a random joke error.")
-            await viewState.update(categories: nil, errorMessage: "There was a category error.")
+            let jokeError = AppUrlSession.RequestError.serverResponse(code: 404)
+            let categoriesError = AppUrlSession.RequestError.serverResponse(code: 404)
+            let jokeResult = GetRandomJokeResult.failure(jokeError)
+            let categoriesResult = GetCategoriesResult.failure(categoriesError)
+            viewState.reduce(with: .getRandomJokeResult(jokeResult))
+            viewState.reduce(with: .getCategoriesResult(categoriesResult))
         }
         .environmentObject(NavigationState())
         .preferredColorScheme(.dark)

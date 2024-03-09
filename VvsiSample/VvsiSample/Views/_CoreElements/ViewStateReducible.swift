@@ -3,8 +3,8 @@
 
 import Foundation
 
-/// Protocol that is implemented by all view states and is consumed by a view agent.
-protocol ViewStateProtocol {
+/// Protocol that is implemented by all view states.
+public protocol ViewStateReducible {
     associatedtype Action
     associatedtype Effect
     mutating func reduce(with effect: Effect)

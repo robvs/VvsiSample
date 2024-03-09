@@ -3,35 +3,38 @@
 
 import Combine
 
-///// Events that can be emitted by a view state relating to the view's lifecycle.
-//enum ViewLifecycleEvent {
-//    case viewWillAppear
-//    case viewDidDisappear
-//}
-
-/// Base class for view state objects, which are objects that drive the dynamic
-/// elements of a view.
+/// Events that can be emitted by a view relating to it's lifecycle.
 ///
-/// `State` is defined by a subclass to represent specific states.
-/// `Event` is defined by a subclass to represent event that can be emitted by the view.
-///
-/// The view emits input event like this:
-/// `.onAppear { viewState.on(viewLifecycleEvent: .viewWillAppear) }`
-class ViewState_orig<State, Event>: ObservableObject {
+/// The view emits lifecycle events like this:
+/// `.task { viewState.send(lifecycleEvent: .viewWillAppear) }`
+/// `.onDisappear { viewState.send(lifecycleEvent: .viewDidDisappear) }`
+enum ViewLifecycleEvent {
+    case viewWillAppear
+    case viewDidDisappear
+}
 
-    // type-alias helper
-    typealias UpdateAction = (ViewState_orig<State, Event>, State) -> Void
+/// Base class for view state objects, which handles interactions with a view.
+///
+/// `State` A specific view's `State` type that conforms to `ViewStateReducible`.
+///
+/// The view emits input actions like this:
+/// `viewState.send(action: .okButtonPressed)`
+class ViewState<State: ViewStateReducible>: ObservableObject {
+
+    /// Define a type for `ViewStateReducible`'s associated type.
+    typealias Action = State.Action
+    typealias Effect = State.Effect
 
     // MARK: Public properties
+
+    /// Object who's properties drive the dynamic elements of the view.
+    @Published private (set) var state: State
 
     /// Publishes view lifecycle events (i.e. viewWillAppear, viewDidDisappear)
     let viewLifecycleEventPublisher: AnyPublisher<ViewLifecycleEvent, Never>
 
-    /// Publishes view events - typically originating from a user action such as a button press.
-    let eventPublisher: AnyPublisher<Event, Never>
-
-    /// The view's current state.
-    private (set) var currentState: State
+    /// Publishes view actions - typically originating from a user action such as a button press.
+    let actionPublisher: AnyPublisher<Action, Never>
 
     // MARK: Alert handling
 
@@ -53,64 +56,60 @@ class ViewState_orig<State, Event>: ObservableObject {
 
     // MARK: private properties
 
-    private let updateAction: UpdateAction
     private var cancellables: [Combine.AnyCancellable] = []
 
     // event subjects that are used to send new events to the event publishers.
     private let viewLifecycleEventSubject: PassthroughSubject<ViewLifecycleEvent, Never>
-    private let eventSubject: PassthroughSubject<Event, Never>
+    private let actionSubject: PassthroughSubject<Action, Never>
 
     // MARK: View lifecycle
 
-    init(with state: State, updateAction: @escaping UpdateAction) {
+    init(initialState: State) {
+        state = initialState
+
         // configure event subjects and publishers.
         viewLifecycleEventSubject = PassthroughSubject<ViewLifecycleEvent, Never>()
         viewLifecycleEventPublisher = viewLifecycleEventSubject.eraseToAnyPublisher()
 
-        eventSubject = PassthroughSubject<Event, Never>()
-        eventPublisher = eventSubject.eraseToAnyPublisher()
-
-        // set the initial state.
-        currentState = state
-        self.updateAction = updateAction
-        updateAction(self, state)
+        actionSubject = PassthroughSubject<Action, Never>()
+        actionPublisher = actionSubject.eraseToAnyPublisher()
 
         listenForInputs()
+    }
+
+    /// Handle changes from the current state to the next state.
+    ///
+    /// Note that callers can't use `viewState.state.reduce()` because `state`
+    /// is defined as `private (set)` in order to ensure that all state mutations are
+    /// routed through this object.
+    func reduce(with effect: Effect) {
+        state.reduce(with: effect)
     }
 
     /// Handle the given view lifecycle event and republish to listeners via `viewLifecycleEventPublisher`.
     ///
     /// This is expected to be called by the view when a lifecycle event happens. For example:
-    /// `.task { viewState.on(viewLifecycleEvent: .viewWillAppear) }`
-    /// `.onDisappear { viewModel.viewLifecycleInput.event.onNext(.viewWillDisappear) }`
+    /// `.task { viewState.send(lifecycleEvent: .viewWillAppear) }`
+    /// `.onDisappear { viewState.send(lifecycleEvent: .viewDidDisappear) }`
     ///
     /// This can be overridden for custom handling.
-    func on(viewLifecycleEvent: ViewLifecycleEvent) {
-        viewLifecycleEventSubject.send(viewLifecycleEvent)
+    func send(lifecycleEvent: ViewLifecycleEvent) {
+        viewLifecycleEventSubject.send(lifecycleEvent)
     }
 
-    /// Handle the given view event and republish to listeners via `eventPublisher`.
+    /// Handle the given action and republish to listeners via `actionPublisher`.
     ///
     /// This is expected to be called by the view when an event such as a button press happens.
     /// This can be overridden for custom handling.
-    func on(event: Event) {
-        eventSubject.send(event)
-    }
-
-    /// Handle updates to the view state - e.g. handle changing the appearance of the view.
-    ///
-    /// This is isolated to `MainActor` to ensure that other objects call it from the main thread.
-    @MainActor
-    func set(state: State) async {
-        updateAction(self, state)
-        currentState = state
+    func send(action: Action) {
+        actionSubject.send(action)
     }
 }
 
 
 // MARK: - Private Helpers
 
-private extension ViewState_orig {
+private extension ViewState {
 
     func listenForInputs() {
         $shouldShowAlert
