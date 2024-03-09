@@ -18,9 +18,16 @@ enum ViewLifecycleEvent {
 ///
 /// The view emits input actions like this:
 /// `viewAgent.send(action: .okButtonPressed)`
-class ViewAgent<Action>: ObservableObject {
+class ViewAgent<State: ViewStateProtocol>: ObservableObject {
+
+    /// Define a type for `ViewStateProtocol`'s associated type.
+    typealias Action = State.Action
+    typealias Effect = State.Effect
 
     // MARK: Public properties
+
+    /// Object that drives the dynamic elements of the view.
+    @Published private (set) var state: State
 
     /// Publishes view lifecycle events (i.e. viewWillAppear, viewDidDisappear)
     let viewLifecycleEventPublisher: AnyPublisher<ViewLifecycleEvent, Never>
@@ -56,7 +63,9 @@ class ViewAgent<Action>: ObservableObject {
 
     // MARK: View lifecycle
 
-    init() {
+    init(initialState: State) {
+        state = initialState
+
         // configure event subjects and publishers.
         viewLifecycleEventSubject = PassthroughSubject<ViewLifecycleEvent, Never>()
         viewLifecycleEventPublisher = viewLifecycleEventSubject.eraseToAnyPublisher()
@@ -65,6 +74,10 @@ class ViewAgent<Action>: ObservableObject {
         actionPublisher = actionSubject.eraseToAnyPublisher()
 
         listenForInputs()
+    }
+
+    func reduce(with effect: Effect) {
+        state.reduce(with: effect)
     }
 
     /// Handle the given view lifecycle event and republish to listeners via `viewLifecycleEventPublisher`.

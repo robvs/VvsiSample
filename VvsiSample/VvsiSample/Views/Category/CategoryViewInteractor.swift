@@ -79,7 +79,7 @@ private extension CategoryViewInteractor {
 
     /// Handle the given user input event.
     @MainActor
-    func handle(action: CategoryViewAgent.Action) {
+    func handle(action: CategoryViewState.Action) {
         switch action {
         case .refreshButtonPressed:
             viewState.reduce(with: .loading)

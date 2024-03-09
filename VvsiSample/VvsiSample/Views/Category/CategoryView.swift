@@ -87,14 +87,12 @@ private extension CategoryView {
 // MARK: - Previews
 
 #Preview("loading") {
-    let viewState = CategoryViewState(categoryName: "Category 1")
-    return CategoryView(viewAgent: CategoryViewAgent(state: viewState))
+    return CategoryView(viewAgent: CategoryViewAgent(categoryName: "Category 1"))
         .preferredColorScheme(.light)
 }
 
 #Preview("ready") {
-    let viewState = CategoryViewState(categoryName: "Category 1")
-    let viewAgent = CategoryViewAgent(state: viewState)
+    let viewAgent = CategoryViewAgent(categoryName: "Category 1")
     return CategoryView(viewAgent: viewAgent)
         .task {
             let result = GetRandomJokesResult.success(["Joke 1", "Joke 2"])
@@ -104,8 +102,7 @@ private extension CategoryView {
 }
 
 #Preview("error") {
-    let viewState = CategoryViewState(categoryName: "Category 1")
-    let viewAgent = CategoryViewAgent(state: viewState)
+    let viewAgent = CategoryViewAgent(categoryName: "Category 1")
     return CategoryView(viewAgent: viewAgent)
         .task {
             let result = GetRandomJokesResult.failure(AppUrlSession.RequestError.serverResponse(code: 404))
@@ -115,7 +112,6 @@ private extension CategoryView {
 }
 
 #Preview("Dark") {
-    let viewState = CategoryViewState(categoryName: "Category 1")
-    return CategoryView(viewAgent: CategoryViewAgent(state: viewState))
+    return CategoryView(viewAgent: CategoryViewAgent(categoryName: "Category 1"))
         .preferredColorScheme(.dark)
 }

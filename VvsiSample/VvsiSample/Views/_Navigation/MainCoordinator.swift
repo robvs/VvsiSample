@@ -51,8 +51,7 @@ private extension MainCoordinator {
             .sink { [weak self] event in
                 switch event {
                 case .category(name: let name):
-                    let categoryViewState = CategoryViewState(categoryName: name)
-                    let categoryViewAgent = CategoryViewAgent(state: categoryViewState)
+                    let categoryViewAgent = CategoryViewAgent(categoryName: name)
                     let categoryViewInteractor = CategoryViewInteractor(viewAgent: categoryViewAgent,
                                                                         session: AppUrlSession.shared)
 
