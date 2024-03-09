@@ -3,11 +3,11 @@
 
 import Combine
 
-/// Events that can be emitted by a view state relating to the view's lifecycle.
-enum ViewLifecycleEvent {
-    case viewWillAppear
-    case viewDidDisappear
-}
+///// Events that can be emitted by a view state relating to the view's lifecycle.
+//enum ViewLifecycleEvent {
+//    case viewWillAppear
+//    case viewDidDisappear
+//}
 
 /// Base class for view state objects, which are objects that drive the dynamic
 /// elements of a view.
@@ -17,10 +17,10 @@ enum ViewLifecycleEvent {
 ///
 /// The view emits input event like this:
 /// `.onAppear { viewState.on(viewLifecycleEvent: .viewWillAppear) }`
-class ViewState<State, Event>: ObservableObject {
+class ViewState_orig<State, Event>: ObservableObject {
 
     // type-alias helper
-    typealias UpdateAction = (ViewState<State, Event>, State) -> Void
+    typealias UpdateAction = (ViewState_orig<State, Event>, State) -> Void
 
     // MARK: Public properties
 
@@ -110,7 +110,7 @@ class ViewState<State, Event>: ObservableObject {
 
 // MARK: - Private Helpers
 
-private extension ViewState {
+private extension ViewState_orig {
 
     func listenForInputs() {
         $shouldShowAlert

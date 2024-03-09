@@ -5,7 +5,7 @@ import Combine
 import OSLog
 import SwiftUI
 
-typealias HomeViewStateBase = ViewState<HomeViewState.State,
+typealias HomeViewStateBase = ViewState_orig<HomeViewState.State,
                                         HomeViewState.Event>
 
 /// Manage view state for the Home screen.
