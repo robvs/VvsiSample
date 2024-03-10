@@ -37,48 +37,54 @@ extension CategoryViewInteractorTests {
 
     func test_initialState_loadSuccess() async throws {
         // Setup/Execute
-        let (sut, urlSession) = await createSut()
+        let viewState = FakeCategoryViewState(categoryName: genericCategory)
+        let (sut, urlSession) = await createSut(viewState: viewState)
 
         // Validate the initial view state
-        XCTAssertEqual(sut.viewState.currentState, .loading)
+        XCTAssertEqual(sut.viewState.state.isLoading, true)
 
         // wait for the interactor to make the full set of joke requests
         // on the session with the specified set of responses.
         await trigger(jokeResponses: jokes, on: urlSession)
 
-        // Validate initial view state after loading has completed
-        await expect(state: .ready(categoryJokes: jokes), on: sut)
+        // Validate that the expected effect was applied to the view state.
+        let requestResult = GetRandomJokesResult.success(jokes)
+        await expect(effect: .getRandomJokesResult(requestResult), on: viewState)
     }
 
     func test_initialState_loadFailure() async throws {
         // Setup/Execute
-        let (sut, urlSession) = await createSut()
+        let viewState = FakeCategoryViewState(categoryName: genericCategory)
+        let (sut, urlSession) = await createSut(viewState: viewState)
 
         // Validate the initial view state
-        XCTAssertEqual(sut.viewState.currentState, .loading)
+        XCTAssertEqual(sut.viewState.state.isLoading, true)
 
         // cause the first joke request to fail
         _ = await waitFor(urlCount: 1, on: urlSession)
         urlSession.triggerJokeResponse(with: nil)
 
-        // Validate initial view state after loading has completed
-        await expect(state: .error(message: FakeUrlSession.requestError.localizedDescription), on: sut)
+        // Validate that the expected effect was applied to the view state.
+        let requestResult = GetRandomJokesResult.failure(FakeUrlSession.requestError)
+        await expect(effect: .getRandomJokesResult(requestResult), on: viewState)
     }
 
     func test_initialState_duplicateJokes() async throws {
         // Setup/Execute
         let duplicates = ["Joke 1", "Joke 1", "Joke 2", "Joke 2", "Joke 2"]
-        let (sut, urlSession) = await createSut()
+        let viewState = FakeCategoryViewState(categoryName: genericCategory)
+        let (sut, urlSession) = await createSut(viewState: viewState)
 
         // Validate the initial view state
-        XCTAssertEqual(sut.viewState.currentState, .loading)
+        XCTAssertEqual(sut.viewState.state.isLoading, true)
 
         // wait for the interactor to make the full set of joke requests
         // on the session with the specified set of responses.
         await trigger(jokeResponses: duplicates, on: urlSession)
 
-        // Validate initial view state after loading has completed
-        await expect(state: .ready(categoryJokes: ["Joke 1", "Joke 2"]), on: sut)
+        // Validate that the expected effect was applied to the view state.
+        let requestResult = GetRandomJokesResult.success(["Joke 1", "Joke 2"])
+        await expect(effect: .getRandomJokesResult(requestResult), on: viewState)
     }
 }
 
@@ -89,11 +95,12 @@ extension CategoryViewInteractorTests {
 
     func test_refreshButtonPressed_success() async throws {
         // Setup
-        let (sut, urlSession) = await createSut(makeReady: true)
+        let viewState = FakeCategoryViewState(categoryName: genericCategory)
+        let (sut, urlSession) = await createSut(viewState: viewState, makeReady: true)
         let originalRequestCount = urlSession.capturedUrls.count
 
         // Execute
-        sut.viewState.on(event: .refreshButtonPressed)
+        sut.viewState.send(action: .refreshButtonPressed)
 
         // wait for the interactor to make the full set of joke requests
         // on the session with the specified set of responses.
@@ -103,23 +110,26 @@ extension CategoryViewInteractorTests {
                       previousRequestCount: originalRequestCount)
 
         // Validate
-        await expect(state: .ready(categoryJokes: otherJokes), on: sut)
+        let requestResult = GetRandomJokesResult.success(otherJokes)
+        await expect(effect: .getRandomJokesResult(requestResult), on: viewState)
     }
 
     func test_refreshButtonPressed_failure() async throws {
         // Setup
-        let (sut, urlSession) = await createSut(makeReady: true)
+        let viewState = FakeCategoryViewState(categoryName: genericCategory)
+        let (sut, urlSession) = await createSut(viewState: viewState, makeReady: true)
         let originalRequestCount = urlSession.capturedUrls.count
 
         // Execute
-        sut.viewState.on(event: .refreshButtonPressed)
+        sut.viewState.send(action: .refreshButtonPressed)
 
         // cause the first joke request to fail
         _ = await waitFor(urlCount: originalRequestCount + 1, on: urlSession)
         urlSession.triggerJokeResponse(with: nil)
 
         // Validate
-        await expect(state: .error(message: FakeUrlSession.requestError.localizedDescription), on: sut)
+        let requestResult = GetRandomJokesResult.failure(FakeUrlSession.requestError)
+        await expect(effect: .getRandomJokesResult(requestResult), on: viewState)
     }
 }
 
@@ -128,8 +138,7 @@ extension CategoryViewInteractorTests {
 
 private extension CategoryViewInteractorTests {
 
-    func createSut(makeReady: Bool = false) async -> (CategoryViewInteractor, FakeUrlSession) {
-        let viewState = CategoryViewState(categoryName: genericCategory)
+    func createSut(viewState: CategoryViewState, makeReady: Bool = false) async -> (CategoryViewInteractor, FakeUrlSession) {
         let urlSession = FakeUrlSession()
         let sut = CategoryViewInteractor(viewState: viewState, session: urlSession)
 
@@ -140,17 +149,17 @@ private extension CategoryViewInteractorTests {
         return (sut, urlSession)
     }
 
-    /// Wait for the specified state on the given view interactor.
+    /// Wait for the specified effect on the given view state.
     /// - parameters:
-    ///  - state: The state that is expected on the given view interactor once async tasks complete.
-    ///  - viewInteractor: The view interactor on which async tasks are in process.
-    func expect(state: CategoryViewState.State, on viewInteractor: CategoryViewInteractor) async {
+    ///  - effect: The effect that is expected to be applied to the given view state.
+    ///  - viewState: The view state to which the effect is expected to be applied.
+    func expect(effect: CategoryViewState.Effect, on viewState: FakeCategoryViewState) async {
         let predicate = NSPredicate { (evalObject, _) -> Bool in
-            return (evalObject as! CategoryViewInteractor).viewState.currentState == state
+            return (evalObject as! FakeCategoryViewState).capturedEffect == effect
         }
 
-        if await wait(forPredicate: predicate, evaluateWith: viewInteractor, timeout: 0.5) == false {
-            XCTFail("State \(state) was not set in the allotted time. Actual state: \(viewInteractor.viewState.currentState)")
+        if await wait(forPredicate: predicate, evaluateWith: viewState, timeout: 0.5) == false {
+            XCTFail("The expected effect \(effect) was not set in the allotted time. Actual effect: \(String(describing: viewState.capturedEffect))")
         }
     }
 

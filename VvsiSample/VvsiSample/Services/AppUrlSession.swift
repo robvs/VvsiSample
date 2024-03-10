@@ -76,7 +76,7 @@ private extension AppUrlSession {
 
 extension AppUrlSession {
 
-    enum RequestError: Error {
+    enum RequestError: Error, Equatable {
         case unexpected(_ description: String)
         case unexpectedError(_ error: Error)
         case serverResponse(code: Int)
@@ -94,6 +94,24 @@ extension AppUrlSession {
             case .unexpected(let description): description
             case .unexpectedError(let error): error.localizedDescription
             case .serverResponse(let code): "A data request error occurred. (code: \(code))"
+            }
+        }
+
+        /// Equatable conformance.
+        static func == (lhs: AppUrlSession.RequestError,
+                        rhs: AppUrlSession.RequestError) -> Bool {
+            switch (lhs, rhs) {
+            case let (.unexpected(lhsDescription), .unexpected(rhsDescription)):
+                return lhsDescription == rhsDescription
+
+            case let (.unexpectedError(lhsError), .unexpectedError(rhsError)):
+                return lhsError.localizedDescription == rhsError.localizedDescription
+
+            case let (.serverResponse(code: lhsCode), .serverResponse(rhsCode)):
+                return lhsCode == rhsCode
+
+            default:
+                return false
             }
         }
     }

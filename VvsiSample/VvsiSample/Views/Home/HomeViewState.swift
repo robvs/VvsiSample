@@ -38,7 +38,7 @@ extension HomeViewState.State: ViewStateReducible {
 
     /// Items that designates how the view state should change, usually
     /// the result of an `Action`.
-    enum Effect {
+    enum Effect: Equatable {
         /// Indicates that the random joke is being fetched.
         case loadingRandomJoke
 

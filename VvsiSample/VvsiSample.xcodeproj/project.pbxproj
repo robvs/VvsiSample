@@ -42,6 +42,7 @@
 		7FE83F3E2B98F57700BB098D /* CategoryViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE83F3D2B98F57700BB098D /* CategoryViewState.swift */; };
 		7FE83F402B99013300BB098D /* ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE83F3F2B99013300BB098D /* ViewState.swift */; };
 		7FE83F422B9BB08D00BB098D /* ViewStateReducible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE83F412B9BB08D00BB098D /* ViewStateReducible.swift */; };
+		7FE83F442B9E258B00BB098D /* FakeViewStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE83F432B9E258B00BB098D /* FakeViewStates.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,6 +102,7 @@
 		7FE83F3D2B98F57700BB098D /* CategoryViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewState.swift; sourceTree = "<group>"; };
 		7FE83F3F2B99013300BB098D /* ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewState.swift; sourceTree = "<group>"; };
 		7FE83F412B9BB08D00BB098D /* ViewStateReducible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStateReducible.swift; sourceTree = "<group>"; };
+		7FE83F432B9E258B00BB098D /* FakeViewStates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeViewStates.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -275,6 +277,7 @@
 			isa = PBXGroup;
 			children = (
 				7FD4470C2B61F3EB00666FDC /* FakeUrlSession.swift */,
+				7FE83F432B9E258B00BB098D /* FakeViewStates.swift */,
 			);
 			path = Fakes;
 			sourceTree = "<group>";
@@ -487,6 +490,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FE83F442B9E258B00BB098D /* FakeViewStates.swift in Sources */,
 				7FD447092B61F2DA00666FDC /* HomeViewInteractorTests.swift in Sources */,
 				7FB273162B1ECFF500AAC5DB /* HomeViewStateTests.swift in Sources */,
 				7F50AD862B620B4E0000F564 /* XCTest.swift in Sources */,
