@@ -67,10 +67,10 @@ private extension HomeViewInteractor {
             .store(in: &cancellables)
 
         // listen for user input events.
-        viewState.eventPublisher
-            .sink { event in
+        viewState.actionPublisher
+            .sink { action in
                 Task { @MainActor [weak self] in
-                    await self?.handle(event: event)
+                    self?.handle(action: action)
                 }
             }
             .store(in: &cancellables)
@@ -78,11 +78,9 @@ private extension HomeViewInteractor {
 
     /// Handle the given user input event.
     @MainActor
-    func handle(event: HomeViewState.Event) async {
-        switch event {
+    func handle(action: HomeViewState.Action) {
+        switch action {
         case .refreshButtonPressed:
-            await viewState.set(state: .loading(includesRandomJoke: true,
-                                                includesCategories: viewState.currentState.isLoadingCategories))
             startFetchOfRandomJoke()
 
         case .categorySelected(let categoryName):
@@ -98,44 +96,59 @@ private extension HomeViewInteractor {
 private extension HomeViewInteractor {
 
     func startFetchOfRandomJoke() {
-        randomJokeTask = Task { @MainActor in
+        updateView(with: .loadingRandomJoke)
+
+        randomJokeTask = Task {
+            let result: GetRandomJokeResult
+
             do {
                 let joke: ChuckNorrisJoke = try await session.get(from: ChuckNorrisIoRequest.getRandomJoke().url)
                 try Task.checkCancellation()
-                await viewState.update(randomJoke: joke.value)
+                result = GetRandomJokeResult.success(joke.value)
             }
             catch let requestError as AppUrlSession.RequestError {
-                let errorMessage = "Retrieval of a random joke failed (\(requestError.code))"
-                await viewState.update(randomJoke: nil, errorMessage: errorMessage)
+                result = GetRandomJokeResult.failure(requestError)
             }
             catch _ as CancellationError {
                 // nothing to do here. cancellation is normal (i.e. because the view disappeared).
+                return
             }
             catch {
-                let errorMessage = "An unexpected error occurred: (\(error.localizedDescription))"
-                await viewState.update(randomJoke: nil, errorMessage: errorMessage)
+                result = GetRandomJokeResult.failure(AppUrlSession.RequestError.unexpected(error.localizedDescription))
             }
+
+            Logger.view.trace("Fetch result: \(String(describing: result))")
+            updateView(with: .getRandomJokeResult(result))
         }
     }
 
     func startFetchOfCategories() {
-        categoriesTask = Task { @MainActor in
+        categoriesTask = Task {
+            let result: GetCategoriesResult
+
             do {
                 let categories: [String] = try await session.get(from: ChuckNorrisIoRequest.getCategories.url)
                 try Task.checkCancellation()
-                await viewState.update(categories: categories)
+                result = GetCategoriesResult.success(categories)
             }
             catch let requestError as AppUrlSession.RequestError {
-                let errorMessage = "Retrieval of a categories failed (\(requestError.code))"
-                await viewState.update(categories: nil, errorMessage: errorMessage)
+                result = GetCategoriesResult.failure(requestError)
             }
             catch _ as CancellationError {
                 // nothing to do here. cancellation is normal (i.e. because the view disappeared).
+                return
             }
             catch {
-                let errorMessage = "An unexpected error occurred: (\(error.localizedDescription))"
-                await viewState.update(categories: nil, errorMessage: errorMessage)
+                result = GetCategoriesResult.failure(AppUrlSession.RequestError.unexpected(error.localizedDescription))
             }
+
+            updateView(with: .getCategoriesResult(result))
+        }
+    }
+
+    func updateView(with effect: HomeViewState.Effect) {
+        Task { @MainActor in
+            viewState.reduce(with: effect)
         }
     }
 

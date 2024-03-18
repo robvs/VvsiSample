@@ -7,8 +7,8 @@ import XCTest
 final class CategoryViewStateTests: XCTestCase {
 
     private let genericCategory = "Category1"
-    private let someCategories = ["Category1", "Category2", "Category3", "Category4"]
-    private let someErrorMessage = "An error happened. No joke."
+    private let someJokes = ["joke1", "joke2", "joke3", "joke4"]
+    private let someError = AppUrlSession.RequestError.serverResponse(code: 404)
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -29,66 +29,66 @@ extension CategoryViewStateTests {
         let sut = CategoryViewState(categoryName: genericCategory)
 
         // Validate
-        XCTAssertEqual(sut.categoryName, genericCategory)
-        XCTAssertEqual(sut.currentState, .loading)
-        XCTAssertEqual(sut.isLoading, true)
-        XCTAssertEqual(sut.categoryJokes.count, 0)
-        XCTAssertNil(sut.errorMessage)
-        XCTAssertEqual(sut.refreshButtonDisabled, true)
+        XCTAssertEqual(sut.state.categoryName, genericCategory)
+        XCTAssertEqual(sut.state.isLoading, true)
+        XCTAssertEqual(sut.state.jokes.isEmpty, true)
+        XCTAssertNil(sut.state.errorMessage)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, true)
     }
 }
 
 
-// MARK: - set(state:)
+// MARK: - reduce()
 
+@MainActor
 extension CategoryViewStateTests {
 
-    func test_setState_ready() async throws {
+    func test_reduce_getJokesSuccess() throws {
         // Setup
-        let expectedState: CategoryViewState.State = .ready(categoryJokes: someCategories)
+        let result = GetRandomJokesResult.success(someJokes)
         let sut = CategoryViewState(categoryName: genericCategory)
 
         // Execute
-        await sut.set(state: expectedState)
+        sut.reduce(with: .getRandomJokesResult(result))
 
         // Validate
-        XCTAssertEqual(sut.currentState, expectedState)
-        XCTAssertEqual(sut.isLoading, false)
-        XCTAssertEqual(sut.categoryJokes.count, someCategories.count)
-        XCTAssertNil(sut.errorMessage)
-        XCTAssertEqual(sut.refreshButtonDisabled, false)
+        XCTAssertEqual(sut.state.categoryName, genericCategory)
+        XCTAssertEqual(sut.state.isLoading, false)
+        XCTAssertEqual(sut.state.jokes, someJokes)
+        XCTAssertNil(sut.state.errorMessage)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, false)
     }
 
-    func test_setState_error() async throws {
+    func test_reduce_getJokesError() throws {
         // Setup
-        let expectedState: CategoryViewState.State = .error(message: someErrorMessage)
+        let result = GetRandomJokesResult.failure(someError)
         let sut = CategoryViewState(categoryName: genericCategory)
 
         // Execute
-        await sut.set(state: expectedState)
+        sut.reduce(with: .getRandomJokesResult(result))
 
         // Validate
-        XCTAssertEqual(sut.currentState, expectedState)
-        XCTAssertEqual(sut.isLoading, false)
-        XCTAssertEqual(sut.categoryJokes.count, 0)
-        XCTAssertEqual(sut.errorMessage, someErrorMessage)
-        XCTAssertEqual(sut.refreshButtonDisabled, false)
+        XCTAssertEqual(sut.state.categoryName, genericCategory)
+        XCTAssertEqual(sut.state.isLoading, false)
+        XCTAssertEqual(sut.state.jokes.isEmpty, true)
+        XCTAssertEqual(sut.state.errorMessage, someError.localizedDescription)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, false)
     }
 
-    func test_setState_readyToLoading() async throws {
+    func test_reduce_getJokes_then_reload() throws {
         // Setup
-        let expectedState: CategoryViewState.State = .loading
+        let result = GetRandomJokesResult.success(someJokes)
         let sut = CategoryViewState(categoryName: genericCategory)
 
         // Execute
-        await sut.set(state: .ready(categoryJokes: someCategories))
-        await sut.set(state: expectedState)
+        sut.reduce(with: .getRandomJokesResult(result))
+        sut.reduce(with: .loading)
 
         // Validate
-        XCTAssertEqual(sut.currentState, expectedState)
-        XCTAssertEqual(sut.isLoading, true)
-        XCTAssertEqual(sut.categoryJokes.count, 0)
-        XCTAssertNil(sut.errorMessage)
-        XCTAssertEqual(sut.refreshButtonDisabled, true)
+        XCTAssertEqual(sut.state.categoryName, genericCategory)
+        XCTAssertEqual(sut.state.isLoading, true)
+        XCTAssertEqual(sut.state.jokes.isEmpty, true)
+        XCTAssertNil(sut.state.errorMessage)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, true)
     }
 }

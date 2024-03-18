@@ -21,7 +21,7 @@ struct AppText: ViewModifier {
 }
 
 /// View extensions for shortcuts to the application text view modifier.
-extension View {
+extension Text {
     func appTitle1() -> some View { modifier(AppText(font: .appTitle1)) }
     func appTitle2() -> some View { modifier(AppText(font: .appTitle2)) }
     func appTitle3() -> some View { modifier(AppText(font: .appTitle3)) }

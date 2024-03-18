@@ -5,8 +5,13 @@ import SwiftUI
 
 struct AppButtonStyle {
 
-    // MARK: - Primary Button Style
-
+    /// Primary button styling.
+    ///
+    /// Usage:
+    /// ```
+    /// Button("Save") { action() }
+    /// .buttonStyle(AppButtonStyle.Primary())
+    /// ```
     struct Primary: ButtonStyle {
         @Environment(\.isEnabled) var isEnabled
 

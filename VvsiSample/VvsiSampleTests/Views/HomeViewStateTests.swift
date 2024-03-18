@@ -6,9 +6,9 @@ import XCTest
 
 final class HomeViewStateTests: XCTestCase {
 
-    let someJoke = "This is a joke."
-    let someCategories = ["Category1", "Category2", "Category3", "Category4"]
-    let someErrorMessage = "An error happened. No joke."
+    private let someJoke = "This is a joke."
+    private let someCategories = ["Category1", "Category2", "Category3", "Category4"]
+    private let someError = AppUrlSession.RequestError.serverResponse(code: 404)
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -29,155 +29,160 @@ extension HomeViewStateTests {
         let sut = HomeViewState()
 
         // Validate
-        XCTAssertEqual(sut.currentState, .loading(includesRandomJoke: true, includesCategories: true))
-        XCTAssertNil(sut.randomJoke)
-        XCTAssertNil(sut.randomJokeError)
-        XCTAssertNil(sut.categories)
-        XCTAssertNil(sut.categoriesError)
-        XCTAssertEqual(sut.refreshButtonDisabled, true)
+        XCTAssertNil(sut.state.randomJoke)
+        XCTAssertNil(sut.state.randomJokeError)
+        XCTAssertNil(sut.state.categories)
+        XCTAssertNil(sut.state.categoriesError)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, true)
     }
 }
 
 
 // MARK: - update(randomJoke:, errorMessage:)
 
+@MainActor
 extension HomeViewStateTests {
 
-    func test_updateRandomJoke_categoriesLoading() async throws {
+    func test_randomJokeSuccess_categoriesLoading() async throws {
         // Setup
+        let result = GetRandomJokeResult.success(someJoke)
         let sut = HomeViewState()
 
         // Execute
-        await sut.update(randomJoke: someJoke)
+        sut.reduce(with: .getRandomJokeResult(result))
 
         // Validate
-        XCTAssertEqual(sut.currentState, .loading(includesRandomJoke: false, includesCategories: true))
-        XCTAssertEqual(sut.randomJoke, someJoke)
-        XCTAssertNil(sut.randomJokeError)
-        XCTAssertNil(sut.categories)
-        XCTAssertNil(sut.categoriesError)
-        XCTAssertEqual(sut.refreshButtonDisabled, true)
+        XCTAssertEqual(sut.state.randomJoke, someJoke)
+        XCTAssertNil(sut.state.randomJokeError)
+        XCTAssertNil(sut.state.categories)
+        XCTAssertNil(sut.state.categoriesError)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, false)
     }
 
-    func test_updateRandomJoke_categoriesLoaded() async throws {
+    func test_randomJokeSuccess_categoriesLoaded() async throws {
         // Setup
+        let jokeResult = GetRandomJokeResult.success(someJoke)
+        let categoriesResult = GetCategoriesResult.success(someCategories)
         let sut = HomeViewState()
-        await sut.update(categories: someCategories)
+        sut.reduce(with: .getCategoriesResult(categoriesResult))
 
         // Execute
-        await sut.update(randomJoke: someJoke)
+        sut.reduce(with: .getRandomJokeResult(jokeResult))
 
         // Validate
-        XCTAssertEqual(sut.currentState, .ready)
-        XCTAssertEqual(sut.randomJoke, someJoke)
-        XCTAssertNil(sut.randomJokeError)
-        XCTAssertEqual(sut.categories?.count, someCategories.count)
-        XCTAssertNil(sut.categoriesError)
-        XCTAssertEqual(sut.refreshButtonDisabled, false)
+        XCTAssertEqual(sut.state.randomJoke, someJoke)
+        XCTAssertNil(sut.state.randomJokeError)
+        XCTAssertEqual(sut.state.categories?.count, someCategories.count)
+        XCTAssertNil(sut.state.categoriesError)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, false)
     }
 
-    func test_updateRandomJoke_withErrorMessage() async throws {
+    func test_randomJokeFail() async throws {
         // Setup
+        let jokeResult = GetRandomJokeResult.failure(someError)
         let sut = HomeViewState()
 
         // Execute
-        await sut.update(randomJoke: nil, errorMessage: someErrorMessage)
+        sut.reduce(with: .getRandomJokeResult(jokeResult))
 
         // Validate
-        XCTAssertEqual(sut.currentState, .loading(includesRandomJoke: false, includesCategories: true))
-        XCTAssertNil(sut.randomJoke)
-        XCTAssertEqual(sut.randomJokeError, someErrorMessage)
-        XCTAssertNil(sut.categories)
-        XCTAssertNil(sut.categoriesError)
-        XCTAssertEqual(sut.refreshButtonDisabled, true)
+        XCTAssertEqual(sut.state.randomJoke?.isEmpty, true)
+        XCTAssertEqual(sut.state.randomJokeError, someError.localizedDescription)
+        XCTAssertNil(sut.state.categories)
+        XCTAssertNil(sut.state.categoriesError)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, false)
     }
 
-    func test_updateRandomJoke_withErrorMessage_categoriesLoaded() async throws {
+    func test_randomJokeFail_categoriesLoaded() async throws {
         // Setup
+        let jokeResult = GetRandomJokeResult.failure(someError)
+        let categoriesResult = GetCategoriesResult.success(someCategories)
         let sut = HomeViewState()
-        await sut.update(categories: someCategories)
+        sut.reduce(with: .getCategoriesResult(categoriesResult))
 
         // Execute
-        await sut.update(randomJoke: nil, errorMessage: someErrorMessage)
+        sut.reduce(with: .getRandomJokeResult(jokeResult))
 
         // Validate
-        XCTAssertEqual(sut.currentState, .ready)
-        XCTAssertNil(sut.randomJoke)
-        XCTAssertEqual(sut.randomJokeError, someErrorMessage)
-        XCTAssertEqual(sut.categories?.count, someCategories.count)
-        XCTAssertNil(sut.categoriesError)
-        XCTAssertEqual(sut.refreshButtonDisabled, false)
+        XCTAssertEqual(sut.state.randomJoke?.isEmpty, true)
+        XCTAssertEqual(sut.state.randomJokeError, someError.localizedDescription)
+        XCTAssertEqual(sut.state.categories?.count, someCategories.count)
+        XCTAssertNil(sut.state.categoriesError)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, false)
     }
 }
 
 
 // MARK: - update(categories:, errorMessage:)
 
+@MainActor
 extension HomeViewStateTests {
 
-    func test_updateCategories_randomJokeLoading() async throws {
+    func test_categoriesSuccess_randomJokeLoading() async throws {
         // Setup
+        let result = GetCategoriesResult.success(someCategories)
         let sut = HomeViewState()
 
         // Execute
-        await sut.update(categories: someCategories)
+        sut.reduce(with: .getCategoriesResult(result))
 
         // Validate
-        XCTAssertEqual(sut.currentState, .loading(includesRandomJoke: true, includesCategories: false))
-        XCTAssertNil(sut.randomJoke)
-        XCTAssertNil(sut.randomJokeError)
-        XCTAssertEqual(sut.categories?.count, someCategories.count)
-        XCTAssertNil(sut.categoriesError)
-        XCTAssertEqual(sut.refreshButtonDisabled, true)
+        XCTAssertNil(sut.state.randomJoke)
+        XCTAssertNil(sut.state.randomJokeError)
+        XCTAssertEqual(sut.state.categories?.count, someCategories.count)
+        XCTAssertNil(sut.state.categoriesError)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, true)
     }
 
-    func test_updateCategories_randomJokeLoaded() async throws {
+    func test_categoriesSuccess_randomJokeLoaded() async throws {
         // Setup
+        let jokeResult = GetRandomJokeResult.success(someJoke)
+        let categoriesResult = GetCategoriesResult.success(someCategories)
         let sut = HomeViewState()
-        await sut.update(randomJoke: someJoke)
+        sut.reduce(with: .getRandomJokeResult(jokeResult))
 
         // Execute
-        await sut.update(categories: someCategories)
+        sut.reduce(with: .getCategoriesResult(categoriesResult))
 
         // Validate
-        XCTAssertEqual(sut.currentState, .ready)
-        XCTAssertEqual(sut.randomJoke, someJoke)
-        XCTAssertNil(sut.randomJokeError)
-        XCTAssertEqual(sut.categories?.count, someCategories.count)
-        XCTAssertNil(sut.categoriesError)
-        XCTAssertEqual(sut.refreshButtonDisabled, false)
+        XCTAssertEqual(sut.state.randomJoke, someJoke)
+        XCTAssertNil(sut.state.randomJokeError)
+        XCTAssertEqual(sut.state.categories?.count, someCategories.count)
+        XCTAssertNil(sut.state.categoriesError)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, false)
     }
 
-    func test_updateCategories_withErrorMessage() async throws {
+    func test_categoriesFail() async throws {
         // Setup
+        let categoriesResult = GetCategoriesResult.failure(someError)
         let sut = HomeViewState()
 
         // Execute
-        await sut.update(categories: nil, errorMessage: someErrorMessage)
+        sut.reduce(with: .getCategoriesResult(categoriesResult))
 
         // Validate
-        XCTAssertEqual(sut.currentState, .loading(includesRandomJoke: true, includesCategories: false))
-        XCTAssertNil(sut.randomJoke)
-        XCTAssertNil(sut.randomJokeError)
-        XCTAssertNil(sut.categories)
-        XCTAssertEqual(sut.categoriesError, someErrorMessage)
-        XCTAssertEqual(sut.refreshButtonDisabled, true)
+        XCTAssertNil(sut.state.randomJoke)
+        XCTAssertNil(sut.state.randomJokeError)
+        XCTAssertEqual(sut.state.categories?.isEmpty, true)
+        XCTAssertEqual(sut.state.categoriesError, someError.localizedDescription)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, true)
     }
 
-    func test_updateCategories_withErrorMessage_randomJokeLoaded() async throws {
+    func test_categoriesFail_randomJokeLoaded() async throws {
         // Setup
+        let jokeResult = GetRandomJokeResult.success(someJoke)
+        let categoriesResult = GetCategoriesResult.failure(someError)
         let sut = HomeViewState()
-        await sut.update(randomJoke: someJoke)
+        sut.reduce(with: .getRandomJokeResult(jokeResult))
 
         // Execute
-        await sut.update(categories: nil, errorMessage: someErrorMessage)
+        sut.reduce(with: .getCategoriesResult(categoriesResult))
 
         // Validate
-        XCTAssertEqual(sut.currentState, .ready)
-        XCTAssertEqual(sut.randomJoke, someJoke)
-        XCTAssertNil(sut.randomJokeError)
-        XCTAssertNil(sut.categories)
-        XCTAssertEqual(sut.categoriesError, someErrorMessage)
-        XCTAssertEqual(sut.refreshButtonDisabled, false)
+        XCTAssertEqual(sut.state.randomJoke, someJoke)
+        XCTAssertNil(sut.state.randomJokeError)
+        XCTAssertEqual(sut.state.categories?.isEmpty, true)
+        XCTAssertEqual(sut.state.categoriesError, someError.localizedDescription)
+        XCTAssertEqual(sut.state.refreshButtonDisabled, false)
     }
 }

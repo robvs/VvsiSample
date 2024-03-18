@@ -7,26 +7,29 @@ import SwiftUI
 struct CategoryView: View {
     @ObservedObject var viewState: CategoryViewState
 
+    /// Convenience property to give direct access to `viewState.state`.
+    private var state: CategoryViewState.State { viewState.state }
+
     private let placeHolderText = "If Chuck Norris goes to Z'ha'dum, he would not die."
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Random \(viewState.categoryName) Jokes")
+            Text("Random \(state.categoryName) Jokes")
                 .appTitle2()
 
-            if let errorMessage = viewState.errorMessage {
+            if let errorMessage = state.errorMessage {
                 Text(errorMessage)
                     .appTextError()
                     .padding(.top)
             }
 
-            if viewState.isLoading {
+            if state.isLoading {
                 loadingPlaceholder()
             }
             else {
                 ScrollView {
                     VStack(spacing: 16) {
-                        ForEach(viewState.categoryJokes, id: \.self) { joke in
+                        ForEach(state.jokes, id: \.self) { joke in
                             row(with: joke)
                         }
                     }
@@ -38,7 +41,7 @@ struct CategoryView: View {
         }
         .padding(.top, 8)
         .padding(.horizontal)
-        .navigationTitle(viewState.categoryName.capitalized)
+        .navigationTitle(state.categoryName.capitalized)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -73,9 +76,10 @@ private extension CategoryView {
             Spacer(minLength: 0)
 
             Button("Refresh") {
-                viewState.on(event: .refreshButtonPressed)
+                viewState.send(action: .refreshButtonPressed)
             }
             .buttonStyle(AppButtonStyle.Primary())
+            .disabled(viewState.state.refreshButtonDisabled)
 
             Spacer(minLength: 0)
         }
@@ -85,29 +89,31 @@ private extension CategoryView {
 // MARK: - Previews
 
 #Preview("loading") {
-    CategoryView(viewState: CategoryViewState(categoryName: "Category 1"))
+    return CategoryView(viewState: CategoryViewState(categoryName: "Category 1"))
         .preferredColorScheme(.light)
 }
 
 #Preview("ready") {
-    let viewState = CategoryViewState(categoryName: "Category 1")
-    return CategoryView(viewState: viewState)
+    let viewAgent = CategoryViewState(categoryName: "Category 1")
+    return CategoryView(viewState: viewAgent)
         .task {
-            await viewState.set(state: .ready(categoryJokes: ["Joke 1", "Joke 2"]))
+            let result = GetRandomJokesResult.success(["Joke 1", "Joke 2"])
+            viewAgent.reduce(with: .getRandomJokesResult(result))
         }
         .preferredColorScheme(.light)
 }
 
 #Preview("error") {
-    let viewState = CategoryViewState(categoryName: "Category 1")
-    return CategoryView(viewState: viewState)
+    let viewAgent = CategoryViewState(categoryName: "Category 1")
+    return CategoryView(viewState: viewAgent)
         .task {
-            await viewState.set(state: .error(message: "Error message..."))
+            let result = GetRandomJokesResult.failure(AppUrlSession.RequestError.serverResponse(code: 404))
+            viewAgent.reduce(with: .getRandomJokesResult(result))
         }
         .preferredColorScheme(.light)
 }
 
 #Preview("Dark") {
-    CategoryView(viewState: CategoryViewState(categoryName: "Category 1"))
+    return CategoryView(viewState: CategoryViewState(categoryName: "Category 1"))
         .preferredColorScheme(.dark)
 }

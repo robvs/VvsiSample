@@ -9,7 +9,7 @@ struct VvsiSampleApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView(viewState: mainCoordinator.homeViewState)
+            HomeView(viewState: mainCoordinator.homeViewInteractor.viewState)
                 .environmentObject(mainCoordinator.navigationState)
         }
     }
