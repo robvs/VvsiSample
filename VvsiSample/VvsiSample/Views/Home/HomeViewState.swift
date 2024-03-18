@@ -3,7 +3,10 @@
 
 import Combine
 
-/// Manage view state for the Home screen.
+/// `ViewState` for the Home screen.
+///
+/// This encapsulates the values for the view's dynamic elements, defines the actions that
+/// can be taken on the view, and how the view transforms from one state to the next.
 class HomeViewState: ViewState<HomeViewState.State> {
 
     /// Encapsulation of values that drive the dynamic elements of the associated view.
@@ -36,7 +39,7 @@ extension HomeViewState.State: ViewStateReducible {
         case categorySelected(name: String)
     }
 
-    /// Items that designates how the view state should change, usually
+    /// Items that designate how the view state should change, usually
     /// the result of an `Action`.
     enum Effect: Equatable {
         /// Indicates that the random joke is being fetched.
@@ -51,7 +54,6 @@ extension HomeViewState.State: ViewStateReducible {
 
     // MARK: Reducer
 
-    /// Handle changes from the current state to the next state.
     mutating func reduce(with effect: Effect) {
         switch effect {
         case .loadingRandomJoke:

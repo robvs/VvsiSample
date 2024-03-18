@@ -1,8 +1,10 @@
 //  Copyright © 2024 Rob Vander Sloot
 //
 
-/// `ViewAgent` for the Category screen. This type definition and
-/// initializer is essentially for convenience.
+/// `ViewState` for the Category screen.
+///
+/// This encapsulates the values for the view's dynamic elements, defines the actions that
+/// can be taken on the view, and how the view transforms from one state to the next.
 class CategoryViewState: ViewState<CategoryViewState.State> {
 
     /// Encapsulation of values that drive the dynamic elements of the associated view.
@@ -34,7 +36,7 @@ extension CategoryViewState.State: ViewStateReducible {
         case refreshButtonPressed
     }
 
-    /// Items that designates how the view state should change, usually
+    /// Items that designate how the view state should change, usually
     /// the result of an `Action`.
     enum Effect: Equatable {
         /// Indicates that jokes are being fetched.
@@ -46,7 +48,6 @@ extension CategoryViewState.State: ViewStateReducible {
 
     // MARK: Reducer
 
-    /// Handle changes from the current state to the next state.
     mutating func reduce(with effect: Effect) {
         switch effect {
         case .loading:

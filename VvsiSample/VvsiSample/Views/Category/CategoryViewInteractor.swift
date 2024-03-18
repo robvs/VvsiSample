@@ -82,7 +82,6 @@ private extension CategoryViewInteractor {
     func handle(action: CategoryViewState.Action) {
         switch action {
         case .refreshButtonPressed:
-            viewState.reduce(with: .loading)
             startFetchOfRandomJokes(for: viewState.state.categoryName)
         }
     }
@@ -94,7 +93,10 @@ private extension CategoryViewInteractor {
 private extension CategoryViewInteractor {
 
     func startFetchOfRandomJokes(for category: String) {
-        randomJokesTask = Task { @MainActor in
+        updateView(with: .loading)
+
+        // get new data asynchronously
+        randomJokesTask = Task {
             let result: GetRandomJokesResult
 
             do {
@@ -124,7 +126,13 @@ private extension CategoryViewInteractor {
             }
 
             Logger.view.trace("Fetch result: \(String(describing: result))")
-            viewState.reduce(with: .getRandomJokesResult(result))
+            updateView(with: .getRandomJokesResult(result))
+        }
+    }
+
+    func updateView(with effect: CategoryViewState.Effect) {
+        Task { @MainActor in
+            viewState.reduce(with: effect)
         }
     }
 

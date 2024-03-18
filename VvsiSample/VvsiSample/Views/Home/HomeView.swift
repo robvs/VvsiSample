@@ -133,8 +133,7 @@ private extension HomeView {
     func error(message: String?) -> some View {
         if let message = message {
             Text(message)
-                .foregroundStyle(.appTextError)
-                .appBodyTextSmall()
+                .appTextError()
         }
         else {
             EmptyView()

@@ -81,7 +81,6 @@ private extension HomeViewInteractor {
     func handle(action: HomeViewState.Action) {
         switch action {
         case .refreshButtonPressed:
-            viewState.reduce(with: .loadingRandomJoke)
             startFetchOfRandomJoke()
 
         case .categorySelected(let categoryName):
@@ -97,7 +96,9 @@ private extension HomeViewInteractor {
 private extension HomeViewInteractor {
 
     func startFetchOfRandomJoke() {
-        randomJokeTask = Task { @MainActor in
+        updateView(with: .loadingRandomJoke)
+
+        randomJokeTask = Task {
             let result: GetRandomJokeResult
 
             do {
@@ -117,12 +118,12 @@ private extension HomeViewInteractor {
             }
 
             Logger.view.trace("Fetch result: \(String(describing: result))")
-            viewState.reduce(with: .getRandomJokeResult(result))
+            updateView(with: .getRandomJokeResult(result))
         }
     }
 
     func startFetchOfCategories() {
-        categoriesTask = Task { @MainActor in
+        categoriesTask = Task {
             let result: GetCategoriesResult
 
             do {
@@ -141,7 +142,13 @@ private extension HomeViewInteractor {
                 result = GetCategoriesResult.failure(AppUrlSession.RequestError.unexpected(error.localizedDescription))
             }
 
-            viewState.reduce(with: .getCategoriesResult(result))
+            updateView(with: .getCategoriesResult(result))
+        }
+    }
+
+    func updateView(with effect: HomeViewState.Effect) {
+        Task { @MainActor in
+            viewState.reduce(with: effect)
         }
     }
 

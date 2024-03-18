@@ -40,6 +40,7 @@ extension CategoryViewStateTests {
 
 // MARK: - reduce()
 
+@MainActor
 extension CategoryViewStateTests {
 
     func test_reduce_getJokesSuccess() throws {

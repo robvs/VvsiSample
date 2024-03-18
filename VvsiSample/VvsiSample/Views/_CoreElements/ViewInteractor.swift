@@ -11,14 +11,14 @@ class ViewInteractor<ViewState, NavigationEvent>: NavigationPathable {
     /// Manages the dynamic elements of a view as well as user interactions.
     let viewState: ViewState
 
-    /// Publishes navigation notifications.
+    /// Publishes navigation events.
     let navigationEventPublisher: AnyPublisher<NavigationEvent, Never>
 
     // MARK: Object lifecycle
 
-    /// Initialize this instance of the base properties.
+    /// Initialize this instance with the given values.
     /// - parameters:
-    ///  - viewState: The view state associated with this interactor used to drive view changes.
+    ///  - viewState: The view state associated with this interactor. It is used to drive view changes.
     ///  - navigationEventPublisher: Publishes navigation notifications.
     init(viewState: ViewState,
          navigationEventPublisher: AnyPublisher<NavigationEvent, Never>) {

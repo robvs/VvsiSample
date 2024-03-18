@@ -5,15 +5,15 @@ import Combine
 import Foundation
 import OSLog
 
-/// Provides navigation coordination for the app's root landing screen (e.g. home screen).
+/// Provides navigation coordination for the app's root landing screen (e.g. `HomeView`).
 class MainCoordinator {
 
     /// Screens to which this coordinator navigates.
     ///
-    /// Note that `ViewInteractor`s are typically used as the path data in order to keep
-    /// an instance in scope while its associated view is on the nav stack. This also causes
-    /// the instance to go out of scope when its associated view is removed from the nav
-    /// stack, thus freeing its memory.
+    /// Note that `pathData` is typically the `ViewInteractor` that is associated with
+    /// the target view. This keeps an instance of the interactor in scope while its associated
+    /// view is on the nav stack. This also causes the instance to go out of scope when its
+    /// associated view is removed from the nav stack, thus freeing the interactor from memory.
     enum Link {
         /// Category screen
         case category(pathData: any NavigationPathable<CategoryViewState>)
@@ -23,9 +23,8 @@ class MainCoordinator {
     /// manage the navigation stack.
     let navigationState = NavigationState()
 
-    // MARK: Home view dependencies.
-    private let homeViewInteractor: HomeViewInteractor
-    var homeViewState: HomeViewState { return homeViewInteractor.viewState }
+    /// Root view interactor that must stay in scope.
+    let homeViewInteractor: HomeViewInteractor
 
     private var cancellables: [Combine.AnyCancellable] = []
 

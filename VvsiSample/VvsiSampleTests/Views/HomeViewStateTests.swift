@@ -40,6 +40,7 @@ extension HomeViewStateTests {
 
 // MARK: - update(randomJoke:, errorMessage:)
 
+@MainActor
 extension HomeViewStateTests {
 
     func test_randomJokeSuccess_categoriesLoading() async throws {
@@ -114,6 +115,7 @@ extension HomeViewStateTests {
 
 // MARK: - update(categories:, errorMessage:)
 
+@MainActor
 extension HomeViewStateTests {
 
     func test_categoriesSuccess_randomJokeLoading() async throws {

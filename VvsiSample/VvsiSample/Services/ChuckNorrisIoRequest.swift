@@ -19,6 +19,7 @@ enum ChuckNorrisIoRequest {
     /// Note: The force unwrap is "safe" to do here because we can be certain that the URL string will parse.
     static let baseUrl = URL(string: "https://api.chucknorris.io")!
 
+
     // MARK: Available API requests
 
     /// Get a random joke for the given category. If `category` is `nil`, get any random joke.
@@ -39,6 +40,7 @@ enum ChuckNorrisIoRequest {
     /// Sample response:
     /// `["animal","career","celebrity"]`
     case getCategories
+
 
     // MARK: Public helpers
 

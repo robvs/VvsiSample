@@ -28,7 +28,6 @@
 		7FBCF7622B65A50500245B7F /* CategoryViewInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FBCF7612B65A50500245B7F /* CategoryViewInteractorTests.swift */; };
 		7FD447092B61F2DA00666FDC /* HomeViewInteractorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD447082B61F2DA00666FDC /* HomeViewInteractorTests.swift */; };
 		7FD4470D2B61F3EB00666FDC /* FakeUrlSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD4470C2B61F3EB00666FDC /* FakeUrlSession.swift */; };
-		7FD4470F2B61F60600666FDC /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD4470E2B61F60600666FDC /* TimeInterval.swift */; };
 		7FE20FF32B3F54A90087FAA5 /* AppAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE20FF22B3F54A90087FAA5 /* AppAlert.swift */; };
 		7FE20FF52B3F612D0087FAA5 /* HomeViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE20FF42B3F612D0087FAA5 /* HomeViewState.swift */; };
 		7FE20FF82B40C4DF0087FAA5 /* ChuckNorrisIoRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE20FF72B40C4DF0087FAA5 /* ChuckNorrisIoRequest.swift */; };
@@ -73,6 +72,7 @@
 		7F65F99E2B4A68B1007E6F2C /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		7F87BFDB2B2C02E3000F6251 /* HomeCategoryListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeCategoryListRow.swift; sourceTree = "<group>"; };
 		7F87BFDE2B30DA14000F6251 /* CategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryView.swift; sourceTree = "<group>"; };
+		7F9CED362B9EB5710011CE37 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7FB273002B1ECFF400AAC5DB /* VvsiSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VvsiSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FB273032B1ECFF400AAC5DB /* VvsiSampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VvsiSampleApp.swift; sourceTree = "<group>"; };
 		7FB273052B1ECFF400AAC5DB /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -88,7 +88,6 @@
 		7FBCF7612B65A50500245B7F /* CategoryViewInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewInteractorTests.swift; sourceTree = "<group>"; };
 		7FD447082B61F2DA00666FDC /* HomeViewInteractorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewInteractorTests.swift; sourceTree = "<group>"; };
 		7FD4470C2B61F3EB00666FDC /* FakeUrlSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeUrlSession.swift; sourceTree = "<group>"; };
-		7FD4470E2B61F60600666FDC /* TimeInterval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInterval.swift; sourceTree = "<group>"; };
 		7FE20FF22B3F54A90087FAA5 /* AppAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppAlert.swift; sourceTree = "<group>"; };
 		7FE20FF42B3F612D0087FAA5 /* HomeViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewState.swift; sourceTree = "<group>"; };
 		7FE20FF72B40C4DF0087FAA5 /* ChuckNorrisIoRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChuckNorrisIoRequest.swift; sourceTree = "<group>"; };
@@ -136,7 +135,6 @@
 				7FE311562B21676E00E097D7 /* Font.swift */,
 				7F308B4D2B1ED679009682EB /* Image.swift */,
 				7F65F99E2B4A68B1007E6F2C /* Logger.swift */,
-				7FD4470E2B61F60600666FDC /* TimeInterval.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -225,6 +223,7 @@
 		7FB273022B1ECFF400AAC5DB /* VvsiSample */ = {
 			isa = PBXGroup;
 			children = (
+				7F9CED362B9EB5710011CE37 /* Info.plist */,
 				7F308B4C2B1ED651009682EB /* Extensions */,
 				7FE20FF62B40C0740087FAA5 /* Services */,
 				7F308B4F2B1ED7D3009682EB /* Views */,
@@ -285,8 +284,8 @@
 		7FE20FEF2B3F4AE90087FAA5 /* _CoreElements */ = {
 			isa = PBXGroup;
 			children = (
-				7FE83F3F2B99013300BB098D /* ViewState.swift */,
 				7F5684E22B54D88800BAFDE9 /* ViewInteractor.swift */,
+				7FE83F3F2B99013300BB098D /* ViewState.swift */,
 				7FE83F412B9BB08D00BB098D /* ViewStateReducible.swift */,
 			);
 			path = _CoreElements;
@@ -459,7 +458,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F5684E32B54D88800BAFDE9 /* ViewInteractor.swift in Sources */,
-				7FD4470F2B61F60600666FDC /* TimeInterval.swift in Sources */,
 				7FE311642B22BDA800E097D7 /* AppButtonStyle.swift in Sources */,
 				7F5684DB2B54813200BAFDE9 /* NavigationState.swift in Sources */,
 				7FE311572B21676E00E097D7 /* Font.swift in Sources */,
@@ -655,6 +653,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VvsiSample/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -694,6 +693,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VvsiSample/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
